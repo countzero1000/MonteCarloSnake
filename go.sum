@@ -1,0 +1,6 @@
+github.com/BattlesnakeOfficial/rules v1.1.13 h1:+HuI3ptpUVPjtGG59z36BP5pP5h/uq5DtAOrLcgHtDg=
+github.com/BattlesnakeOfficial/rules v1.1.13/go.mod h1:wq8p035Xm9Xo2nX3yWCeK0tJAwk4KVb2FIK4u9zPhJo=
+github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
+gopkg.in/yaml.v2 v2.2.8 h1:obN1ZagJSUGI0Ek/LBmuj4SNLPfIny3KsKFopxRdj10=

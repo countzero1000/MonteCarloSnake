@@ -94,6 +94,11 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 		for _, other_snake := range game.board.Snakes {
 
+			// don't collide with self
+			if other_snake.ID == snakeId {
+				continue
+			}
+
 			if snakeHasLostHeadToHead(snake, &other_snake) {
 				valid_move = false
 				break

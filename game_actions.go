@@ -170,6 +170,14 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 				valid = false
 				break
 			}
+			if snake.ID == snake_moved.ID {
+				continue
+			}
+
+			if snakeHasLostHeadToHead(&snake_moved, &snake) {
+				valid = false
+				break
+			}
 		}
 
 		if valid {

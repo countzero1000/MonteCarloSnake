@@ -30,6 +30,7 @@ func new_tree(my_snake string, game GameState) Tree {
 			children: []*Node{},
 			parent:   nil,
 			board:    simulationFromGame(&game),
+			table:    make(map[string]int),
 		},
 	}
 }
@@ -193,7 +194,7 @@ func (node *Node) play_out() {
 }
 
 func (node *Node) back_prop(winner string) {
-	node.table[winner]++
+	add_to_map(node.table, winner, 1)
 	node.sims++
 
 	if node.parent != nil {
@@ -214,7 +215,7 @@ func create_child(parent *Node, joint_move []rules.SnakeMove, board Simulation) 
 
 	return &Node{
 		sims:       0,
-		table:      make(map[string]int),
+		table:      uct_table,
 		joint_move: joint_move,
 		children:   []*Node{},
 		parent:     parent,

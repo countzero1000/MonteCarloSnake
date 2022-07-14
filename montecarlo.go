@@ -21,11 +21,11 @@ type Node struct {
 	joint_move []rules.SnakeMove
 }
 
-const c float64 = 2.141
+const c float64 = 1.141
 
-func new_tree(my_snake string, game GameState) Tree {
+func new_tree(game GameState) Tree {
 	return Tree{
-		player: my_snake,
+		player: game.You.ID,
 		root: &Node{
 			children: []*Node{},
 			parent:   nil,
@@ -56,7 +56,7 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 	}
 
 	most_sims := 0
-	best_move := rules.MoveUp
+	best_move := rules.MoveDown
 
 	for move, sims := range sims_for_move {
 		if sims > most_sims {
@@ -108,8 +108,11 @@ func (node *Node) select_node() *Node {
 			var best_val float64 = 0
 
 			for move, sims := range move_sim_sum {
-
-				utc_val := calc_utc_val(move_win_sum[move], sims, node.parent.sims)
+				parent_sims := 1
+				if node.parent != nil {
+					parent_sims = node.parent.sims
+				}
+				utc_val := calc_utc_val(move_win_sum[move], sims, parent_sims)
 
 				if utc_val > float64(best_val) {
 					best_move = move
@@ -143,8 +146,7 @@ func compare_joint_move(joint_move []rules.SnakeMove, other []rules.SnakeMove) b
 			}
 		}
 	}
-
-	return matches == len(joint_move)
+	return matches == len(joint_move)-1
 }
 
 func calc_utc_val(wins int, sims int, parent_sims int) float64 {
@@ -152,13 +154,14 @@ func calc_utc_val(wins int, sims int, parent_sims int) float64 {
 
 }
 
-func add_to_map[K comparable](m map[K]int, key K, val int) {
-	val, exists := m[key]
+func add_to_map(m map[string]int, key string, insert_val int) {
+	_, exists := m[key]
 	if exists {
-		m[key] += val
+		m[key] += insert_val
 	} else {
-		m[key] = val
+		m[key] = insert_val
 	}
+
 }
 
 func get_move_by_snake(snake_id string, joint_move []rules.SnakeMove) rules.SnakeMove {
@@ -184,8 +187,8 @@ func (node *Node) play_out() {
 		copy_board.board = *new_board
 		game_over = new_game_over
 
-		if err == nil {
-			println(err)
+		if err != nil {
+			println(err.Error())
 			panic("error thrown while playing out")
 		}
 	}

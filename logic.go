@@ -43,7 +43,7 @@ func end(state GameState) {
 // We've provided some code and comments to get you started.
 func move(state GameState) BattlesnakeMoveResponse {
 
-	tree := new_tree(state.You.ID, state)
+	tree := new_tree(state)
 
 	return BattlesnakeMoveResponse{
 		Move: tree.monte_move().Move,

@@ -33,18 +33,25 @@ func (sim *Simulation) generateMoveMatrix() [][]rules.SnakeMove {
 	for _, snake := range sim.board.Snakes {
 		snake_id := snake.ID
 		moves := sim.getValidMoves(snake_id)
-		if len(moves) == 0 {
-			moves = []rules.SnakeMove{rules.SnakeMove{ID: snake_id, Move: rules.MoveUp}}
-		}
 
+		if len(moves) == 0 {
+			moves = []rules.SnakeMove{{ID: snake_id, Move: rules.MoveUp}}
+		}
 		var new_matrix = [][]rules.SnakeMove{}
 
-		for _, move := range moves {
-			for _, move_arr := range move_matrix {
-				move_arr = append(move_arr, move)
-				new_matrix = append(new_matrix, move_arr)
+		if len(move_matrix) == 0 {
+			for _, move := range moves {
+				new_matrix = append(new_matrix, []rules.SnakeMove{move})
+			}
+		} else {
+			for _, move := range moves {
+				for _, move_arr := range move_matrix {
+					move_arr = append(move_arr, move)
+					new_matrix = append(new_matrix, move_arr)
+				}
 			}
 		}
+
 		move_matrix = new_matrix
 	}
 	return move_matrix

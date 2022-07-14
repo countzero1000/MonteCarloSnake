@@ -198,6 +198,10 @@ func (node *Node) play_out() {
 	game_over := false
 	copy_board := node.board.copy()
 	for !game_over {
+		if iterations > 50 {
+			node.back_prop(node.player)
+			return
+		}
 		joint_moves := copy_board.generateMoveMatrix()
 		if len(joint_moves) == 0 {
 			game_over = true

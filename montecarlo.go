@@ -39,7 +39,7 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 
 	tree.root.expandNode()
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1000; i++ {
 		tree.expand_tree()
 	}
 

@@ -8,8 +8,10 @@ import (
 )
 
 func test_monte_move(t *testing.T) {
+
 	test_body, err := os.ReadFile("test_request.json")
 	if err != nil {
+		t.Fail()
 		panic(err.Error())
 	}
 
@@ -18,9 +20,13 @@ func test_monte_move(t *testing.T) {
 	err2 := json.Unmarshal(test_body, &state)
 
 	if err2 != nil {
+		t.Fail()
 		log.Printf("ERROR: Failed to decode move json, %s", err)
 		return
 	}
 
-	println(move(state).Move)
+	log.Println(move(state).Move)
+
+	t.Fatal()
+
 }

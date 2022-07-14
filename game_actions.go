@@ -162,14 +162,23 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 		if new_head.X >= game.board.Width || new_head.X < 0 || new_head.Y >= game.board.Height || new_head.Y < 0 {
 			continue
 		}
-		if snake_self_collided(&snake_moved, &snake_moved) {
-			continue
+
+		valid := true
+
+		for _, snake := range game.board.Snakes {
+			if snake_self_collided(&snake_moved, &snake) {
+				valid = false
+				break
+			}
 		}
 
-		valid_moves = append(valid_moves, rules.SnakeMove{
-			ID:   snakeId,
-			Move: dir,
-		})
+		if valid {
+			valid_moves = append(valid_moves, rules.SnakeMove{
+				ID:   snakeId,
+				Move: dir,
+			})
+		}
+
 	}
 	return valid_moves
 }

@@ -226,10 +226,18 @@ func (node *Node) play_out() {
 		}
 		iterations += 1
 	}
-	winner := copy_board.board.Snakes[0].ID
+	winner := get_winner(node.board.board.Snakes)
 	println(len(copy_board.board.Snakes), "len of snakes after game is over", copy_board.board.Snakes[0].EliminatedCause, iterations)
 	// println("finished with", iterations, "winner", winner, "node.player", node.player)
 	node.back_prop(winner)
+}
+func get_winner(snakes []rules.Snake) string {
+	for _, snake := range snakes {
+		if snake.EliminatedBy == "" {
+			return snake.ID
+		}
+	}
+	return ""
 }
 
 func (node *Node) back_prop(winner string) {

@@ -35,7 +35,6 @@ func (sim *Simulation) generateMoveMatrix() [][]rules.SnakeMove {
 		moves := sim.getValidMoves(snake_id)
 
 		if len(moves) == 0 {
-			println("empty moves")
 			moves = []rules.SnakeMove{{ID: snake_id, Move: rules.MoveUp}}
 		}
 

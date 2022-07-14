@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/BattlesnakeOfficial/rules"
+	"github.com/joho/godotenv"
 )
 
 type Tree struct {
@@ -40,8 +41,13 @@ func new_tree(game GameState) Tree {
 func (tree *Tree) monte_move() rules.SnakeMove {
 
 	tree.root.expandNode()
-	iterations, _ := strconv.Atoi(os.Getenv("iterations"))
-
+	godotenv.Load(".env")
+	iterations, err := strconv.Atoi(os.Getenv("iterations"))
+	if err != nil {
+		println(err.Error())
+		panic("error")
+	}
+	println("running with", iterations, "iterations")
 	for i := 0; i < iterations; i++ {
 		tree.expand_tree()
 	}

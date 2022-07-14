@@ -7,8 +7,6 @@ package main
 
 import (
 	"log"
-
-	"github.com/BattlesnakeOfficial/rules"
 )
 
 // This function is called when you register your Battlesnake on play.battlesnake.com
@@ -45,17 +43,9 @@ func end(state GameState) {
 // We've provided some code and comments to get you started.
 func move(state GameState) BattlesnakeMoveResponse {
 
-	sim := simulationFromGame(&state)
-
-	valid_moves := sim.getValidMoves(state.You.ID)
-
-	if len(valid_moves) == 0 {
-		return BattlesnakeMoveResponse{
-			Move: rules.MoveUp,
-		}
-	}
+	tree := new_tree(state.You.ID, state)
 
 	return BattlesnakeMoveResponse{
-		Move: valid_moves[0].Move,
+		Move: tree.monte_move().Move,
 	}
 }

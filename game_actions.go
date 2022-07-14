@@ -10,13 +10,13 @@ type Simulation struct {
 	rules_set rules.StandardRuleset
 }
 
-type Tree struct {
-	settings  rules.Settings
-	rules_set rules.StandardRuleset
+func (sim *Simulation) copy() Simulation {
+	return Simulation{
+		board:     *sim.board.Clone(),
+		settings:  sim.settings,
+		rules_set: sim.rules_set,
+	}
 }
-
-// func (game *Simulation) getAllValidMoves() [][]rules.SnakeMove {
-// }
 
 func simulationFromGame(game *GameState) Simulation {
 	return Simulation{
@@ -26,6 +26,28 @@ func simulationFromGame(game *GameState) Simulation {
 			Snakes: convertSnakes(game.Board.Snakes),
 		},
 	}
+}
+
+func (sim *Simulation) generateMoveMatrix() [][]rules.SnakeMove {
+	var move_matrix = [][]rules.SnakeMove{}
+	for _, snake := range sim.board.Snakes {
+		snake_id := snake.ID
+		moves := sim.getValidMoves(snake_id)
+		if len(moves) == 0 {
+			moves = []rules.SnakeMove{rules.SnakeMove{ID: snake_id, Move: rules.MoveUp}}
+		}
+
+		var new_matrix = [][]rules.SnakeMove{}
+
+		for _, move := range moves {
+			for _, move_arr := range move_matrix {
+				move_arr = append(move_arr, move)
+				new_matrix = append(new_matrix, move_arr)
+			}
+		}
+		move_matrix = new_matrix
+	}
+	return move_matrix
 }
 
 func convertSnakes(api_snakes []Battlesnake) []rules.Snake {

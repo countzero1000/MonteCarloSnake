@@ -25,6 +25,28 @@ func simulationFromGame(game *GameState) Simulation {
 			Width:  game.Board.Width,
 			Snakes: convertSnakes(game.Board.Snakes),
 		},
+		rules_set: convert_ruleset(game.Game.Ruleset),
+		settings:  convert_settings(game.Game.Ruleset.Settings),
+	}
+}
+
+func convert_settings(settings Settings) rules.Settings {
+	return rules.Settings{
+		FoodSpawnChance:     int(settings.FoodSpawnChance),
+		MinimumFood:         int(settings.MinimumFood),
+		HazardDamagePerTurn: int(settings.HazardDamagePerTurn),
+		RoyaleSettings: rules.RoyaleSettings{
+			ShrinkEveryNTurns: int(settings.Royale.ShrinkEveryNTurns),
+		},
+		SquadSettings: rules.SquadSettings(settings.Squad),
+	}
+}
+
+func convert_ruleset(ruleset Ruleset) rules.StandardRuleset {
+	return rules.StandardRuleset{
+		FoodSpawnChance:     int(ruleset.Settings.FoodSpawnChance), // [0, 100]
+		MinimumFood:         int(ruleset.Settings.MinimumFood),
+		HazardDamagePerTurn: int(ruleset.Settings.HazardDamagePerTurn),
 	}
 }
 

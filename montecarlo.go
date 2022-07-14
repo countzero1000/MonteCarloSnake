@@ -25,7 +25,7 @@ type Node struct {
 	joint_move []rules.SnakeMove
 }
 
-const c float64 = 1.3
+const c float64 = 1.141
 
 func new_tree(game GameState) Tree {
 	return Tree{
@@ -223,24 +223,25 @@ func (node *Node) play_out() {
 		}
 		iterations += 1
 	}
-	winner := get_winner(node.board.board.Snakes)
-	for _, snakes := range copy_board.board.Snakes {
-		println(snakes.ID, "eliminated by", snakes.EliminatedCause)
-	}
-	println("finished with", iterations, "winner", winner, "node.player", node.player)
+	winner := get_winner(copy_board.board.Snakes)
+
 	node.back_prop(winner)
 }
-func get_winner(snakes []rules.Snake) string {
+func get_winner(snakes []rules.Snake) []string {
+
+	winners := []string{}
 	for _, snake := range snakes {
-		if snake.EliminatedCause == "" {
-			return snake.ID
+		if len(snake.EliminatedCause) == 0 {
+			winners = append(winners, snake.ID)
 		}
 	}
-	return "tie"
+	return winners
 }
 
-func (node *Node) back_prop(winner string) {
-	add_to_map(node.table, winner, 1)
+func (node *Node) back_prop(winner []string) {
+	for _, win := range winner {
+		add_to_map(node.table, win, 1)
+	}
 	node.sims++
 
 	if node.parent != nil {

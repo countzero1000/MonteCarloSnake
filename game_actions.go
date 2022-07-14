@@ -137,7 +137,7 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 			continue
 		}
 		if snake_self_collided(&snake_moved, &snake_moved) {
-			break
+			continue
 		}
 
 		valid_moves = append(valid_moves, rules.SnakeMove{

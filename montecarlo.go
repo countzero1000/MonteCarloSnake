@@ -71,18 +71,26 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 		add_to_map(wins_for_move, move.Move, child.table[snake_id])
 	}
 
-	var most_sims float32 = 0.0
+	var most_val float32 = 0.0
+	var most_sims = 0
 
 	for move, sims := range sims_for_move {
 		println(wins_for_move[move], sims, move)
 		value := (float32)(wins_for_move[move]) / (float32)(sims)
-		if value > most_sims {
-			most_sims = value
+		if value > most_val {
+			most_val = value
+			most_sims = sims
 			best_move = move
+		} else if value == most_val {
+			if sims > most_sims {
+				most_val = value
+				most_sims = sims
+				best_move = move
+			}
 		}
 	}
 
-	println("selected best move with", most_sims, "action", move)
+	println("selected best move with", most_sims, "action", best_move)
 	return rules.SnakeMove{ID: snake_id, Move: best_move}
 }
 

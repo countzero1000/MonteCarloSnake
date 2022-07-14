@@ -25,7 +25,7 @@ type Node struct {
 	joint_move []rules.SnakeMove
 }
 
-const c float64 = 1.141
+const c float64 = 1.3
 
 func new_tree(game GameState) Tree {
 	return Tree{
@@ -90,7 +90,7 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 		}
 	}
 
-	println("selected best move with", most_sims, "action", best_move)
+	println(node.player, "selected best move with", most_sims, "action", best_move)
 	return rules.SnakeMove{ID: snake_id, Move: best_move}
 }
 
@@ -197,7 +197,7 @@ func get_move_by_snake(snake_id string, joint_move []rules.SnakeMove) rules.Snak
 			return move
 		}
 	}
-	panic("for some reason there was no move found")
+	return rules.SnakeMove{ID: snake_id, Move: rules.MoveDown}
 }
 
 func (node *Node) play_out() {
@@ -206,10 +206,7 @@ func (node *Node) play_out() {
 	game_over := false
 	copy_board := node.board.copy()
 	for !game_over {
-		if iterations > 50 {
-			node.back_prop(node.player)
-			return
-		}
+
 		joint_moves := copy_board.generateMoveMatrix()
 		if len(joint_moves) == 0 {
 			game_over = true
@@ -218,7 +215,7 @@ func (node *Node) play_out() {
 		selected_move := joint_moves[rand.Intn(len(joint_moves))]
 		new_game_over, new_board, err := copy_board.executeActions(selected_move)
 		copy_board.board = *new_board
-		game_over = !new_game_over
+		game_over = new_game_over
 
 		if err != nil {
 			println(err.Error())
@@ -227,7 +224,9 @@ func (node *Node) play_out() {
 		iterations += 1
 	}
 	winner := get_winner(node.board.board.Snakes)
-	println(len(copy_board.board.Snakes), "len of snakes after game is over", copy_board.board.Snakes[0].EliminatedCause, iterations)
+	// for _, snakes := range copy_board.board.Snakes {
+	// 	println(snakes.ID, "eliminated by", snakes.EliminatedCause)
+	// }
 	// println("finished with", iterations, "winner", winner, "node.player", node.player)
 	node.back_prop(winner)
 }
@@ -237,7 +236,7 @@ func get_winner(snakes []rules.Snake) string {
 			return snake.ID
 		}
 	}
-	return ""
+	return "tie"
 }
 
 func (node *Node) back_prop(winner string) {

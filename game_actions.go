@@ -35,7 +35,7 @@ func (sim *Simulation) generateMoveMatrix() [][]rules.SnakeMove {
 		moves := sim.getValidMoves(snake_id)
 
 		if len(moves) == 0 {
-			moves = []rules.SnakeMove{{ID: snake_id, Move: rules.MoveUp}}
+			continue
 		}
 
 		var new_matrix = [][]rules.SnakeMove{}
@@ -127,6 +127,10 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 	var valid_moves = []rules.SnakeMove{}
 
+	if snake.EliminatedCause != "" {
+		return valid_moves
+	}
+
 	for _, dir := range dirs {
 
 		snake_moved := move_snake(copy_snake(*snake), dir)
@@ -194,5 +198,30 @@ func get_snake(board rules.BoardState, snakeId string) *rules.Snake {
 }
 
 func (game *Simulation) executeActions(moves []rules.SnakeMove) (bool, *rules.BoardState, error) {
+	if len(moves) < len(game.board.Snakes) {
+		missing := find_missing_snakes(moves, game.board.Snakes)
+		for _, mimissing_id := range missing {
+			moves = append(moves, rules.SnakeMove{
+				ID:   mimissing_id,
+				Move: rules.MoveDown,
+			})
+		}
+	}
 	return game.rules_set.Execute(&game.board, game.settings, moves)
+}
+
+func find_missing_snakes(moves []rules.SnakeMove, snakes []rules.Snake) []string {
+	missing := []string{}
+	for _, snake := range snakes {
+		found := false
+		for _, move := range moves {
+			if snake.ID == move.ID {
+				found = true
+			}
+		}
+		if !found {
+			missing = append(missing, snake.ID)
+		}
+	}
+	return missing
 }

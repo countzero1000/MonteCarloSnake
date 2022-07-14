@@ -232,7 +232,7 @@ func (node *Node) play_out() {
 }
 func get_winner(snakes []rules.Snake) string {
 	for _, snake := range snakes {
-		if snake.EliminatedBy == "" {
+		if snake.EliminatedCause == "" {
 			return snake.ID
 		}
 	}

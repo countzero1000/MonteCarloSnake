@@ -74,7 +74,7 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 	var most_sims float32 = 0.0
 
 	for move, sims := range sims_for_move {
-		println(wins_for_move[move], sims)
+		println(wins_for_move[move], sims, move)
 		value := (float32)(wins_for_move[move]) / (float32)(sims)
 		if value > most_sims {
 			most_sims = value
@@ -82,7 +82,7 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 		}
 	}
 
-	// println("selected best move with", most_sims)
+	println("selected best move with", most_sims, "action", move)
 	return rules.SnakeMove{ID: snake_id, Move: best_move}
 }
 

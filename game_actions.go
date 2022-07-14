@@ -136,7 +136,7 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 		if new_head.X >= game.board.Width || new_head.X < 0 || new_head.Y >= game.board.Height || new_head.Y < 0 {
 			continue
 		}
-		if snakeHasBodyCollided(&snake_moved, &snake_moved) {
+		if snake_self_collided(&snake_moved, &snake_moved) {
 			break
 		}
 
@@ -171,12 +171,10 @@ func snakeHasLostHeadToHead(s *rules.Snake, other *rules.Snake) bool {
 	return false
 }
 
-func snakeHasBodyCollided(s *rules.Snake, other *rules.Snake) bool {
+func snake_self_collided(s *rules.Snake, other *rules.Snake) bool {
 	head := s.Body[0]
-	for i, body := range other.Body {
-		if i == 0 {
-			continue
-		} else if head.X == body.X && head.Y == body.Y {
+	for _, body := range other.Body {
+		if head.X == body.X && head.Y == body.Y {
 			return true
 		}
 	}

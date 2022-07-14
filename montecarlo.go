@@ -224,10 +224,10 @@ func (node *Node) play_out() {
 		iterations += 1
 	}
 	winner := get_winner(node.board.board.Snakes)
-	// for _, snakes := range copy_board.board.Snakes {
-	// 	println(snakes.ID, "eliminated by", snakes.EliminatedCause)
-	// }
-	// println("finished with", iterations, "winner", winner, "node.player", node.player)
+	for _, snakes := range copy_board.board.Snakes {
+		println(snakes.ID, "eliminated by", snakes.EliminatedCause)
+	}
+	println("finished with", iterations, "winner", winner, "node.player", node.player)
 	node.back_prop(winner)
 }
 func get_winner(snakes []rules.Snake) string {

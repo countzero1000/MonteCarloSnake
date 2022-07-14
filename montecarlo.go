@@ -174,6 +174,10 @@ func (node *Node) play_out() {
 	copy_board := node.board.copy()
 	for !game_over {
 		joint_moves := copy_board.generateMoveMatrix()
+		if len(joint_moves) == 0 {
+			game_over = true
+			break
+		}
 		selected_move := joint_moves[rand.Intn(len(joint_moves))]
 		new_game_over, new_board, err := copy_board.executeActions(selected_move)
 		copy_board.board = *new_board

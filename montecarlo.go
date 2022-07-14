@@ -39,7 +39,7 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 
 	tree.root.expandNode()
 
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 1; i++ {
 		tree.expand_tree()
 	}
 
@@ -104,7 +104,7 @@ func (node *Node) select_node() *Node {
 			}
 
 			// get max move for the snake
-			best_move := rules.MoveUp
+			best_move := rules.MoveDown
 			var best_val float64 = 0
 
 			for move, sims := range move_sim_sum {

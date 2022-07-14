@@ -35,8 +35,10 @@ func (sim *Simulation) generateMoveMatrix() [][]rules.SnakeMove {
 		moves := sim.getValidMoves(snake_id)
 
 		if len(moves) == 0 {
+			println("empty moves")
 			moves = []rules.SnakeMove{{ID: snake_id, Move: rules.MoveUp}}
 		}
+
 		var new_matrix = [][]rules.SnakeMove{}
 
 		if len(move_matrix) == 0 {
@@ -84,7 +86,7 @@ func convertBody(body []Coord) []rules.Point {
 	return new_body
 }
 
-func move_snake(snake rules.Snake, appliedMove string) rules.Snake {
+func move_snake(snake *rules.Snake, appliedMove string) rules.Snake {
 	newHead := rules.Point{}
 	switch appliedMove {
 	// Guaranteed to be one of these options given the clause above
@@ -102,17 +104,17 @@ func move_snake(snake rules.Snake, appliedMove string) rules.Snake {
 		newHead.Y = snake.Body[0].Y
 	}
 	snake.Body = append([]rules.Point{newHead}, snake.Body[:len(snake.Body)-1]...)
-	return snake
+	return *snake
 }
 
-func copy_snake(snake rules.Snake) rules.Snake {
+func copy_snake(snake rules.Snake) *rules.Snake {
 	new_body := []rules.Point{}
 
 	for _, p := range snake.Body {
 		new_body = append(new_body, p)
 	}
 
-	return rules.Snake{
+	return &rules.Snake{
 		ID:   snake.ID,
 		Body: new_body,
 	}
@@ -132,7 +134,6 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 		new_head := snake_moved.Body[0]
 
 		// check for wall collisions
-
 		if new_head.X >= game.board.Width || new_head.X < 0 || new_head.Y >= game.board.Height || new_head.Y < 0 {
 			continue
 		}
@@ -173,7 +174,10 @@ func snakeHasLostHeadToHead(s *rules.Snake, other *rules.Snake) bool {
 
 func snake_self_collided(s *rules.Snake, other *rules.Snake) bool {
 	head := s.Body[0]
-	for _, body := range other.Body {
+	for i, body := range other.Body {
+		if i == 0 {
+			continue
+		}
 		if head.X == body.X && head.Y == body.Y {
 			return true
 		}

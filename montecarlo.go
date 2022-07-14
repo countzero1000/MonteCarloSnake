@@ -58,21 +58,29 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 
 	sims_for_move := make(map[string]int)
+	wins_for_move := make(map[string]int)
+
+	best_move := rules.MoveDown
 
 	for _, child := range node.children {
 		move := get_move_by_snake(snake_id, child.joint_move)
+		best_move = move.Move
 		add_to_map(sims_for_move, move.Move, child.sims)
+		add_to_map(sims_for_move, move.Move, child.table[snake_id])
 	}
 
-	most_sims := 0
-	best_move := rules.MoveDown
+	var most_sims float32 = 0.0
 
 	for move, sims := range sims_for_move {
-		if sims > most_sims {
-			most_sims = sims
+		println(wins_for_move[move], sims)
+		value := (float32)(wins_for_move[move]) / (float32)(sims)
+		if value > most_sims {
+			most_sims = value
 			best_move = move
 		}
 	}
+
+	println("selected best move with", most_sims)
 	return rules.SnakeMove{ID: snake_id, Move: best_move}
 }
 

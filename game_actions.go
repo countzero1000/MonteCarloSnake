@@ -84,65 +84,67 @@ func convertBody(body []Coord) []rules.Point {
 	return new_body
 }
 
+func move_snake(snake rules.Snake, appliedMove string) rules.Snake {
+	newHead := rules.Point{}
+	switch appliedMove {
+	// Guaranteed to be one of these options given the clause above
+	case rules.MoveUp:
+		newHead.X = snake.Body[0].X
+		newHead.Y = snake.Body[0].Y + 1
+	case rules.MoveDown:
+		newHead.X = snake.Body[0].X
+		newHead.Y = snake.Body[0].Y - 1
+	case rules.MoveLeft:
+		newHead.X = snake.Body[0].X - 1
+		newHead.Y = snake.Body[0].Y
+	case rules.MoveRight:
+		newHead.X = snake.Body[0].X + 1
+		newHead.Y = snake.Body[0].Y
+	}
+	snake.Body = append([]rules.Point{newHead}, snake.Body[:len(snake.Body)-1]...)
+	return snake
+}
+
+func copy_snake(snake rules.Snake) rules.Snake {
+	new_body := []rules.Point{}
+
+	for _, p := range snake.Body {
+		new_body = append(new_body, p)
+	}
+
+	return rules.Snake{
+		ID:   snake.ID,
+		Body: new_body,
+	}
+}
+
 func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 	snake := get_snake(game.board, snakeId)
 
-	var dirs = [][]int{{1, 0}, {-1, 0}, {0, -1}, {0, 1}}
+	var dirs = []string{rules.MoveUp, rules.MoveDown, rules.MoveLeft, rules.MoveRight}
 
 	var valid_moves = []rules.SnakeMove{}
 
 	for _, dir := range dirs {
 
-		x_dir := dir[0]
-		y_dir := dir[1]
-
-		head := snake.Body[0]
-
-		new_head := rules.Point{}
-		new_head.X = head.X + x_dir
-		new_head.Y = head.Y + y_dir
-
-		//check for neck collision
-		if len(snake.Body) > 1 {
-			neck := snake.Body[1]
-			if neck.X == new_head.X && neck.Y == new_head.Y {
-				continue
-			}
-		}
+		snake_moved := move_snake(copy_snake(*snake), dir)
+		new_head := snake_moved.Body[0]
 
 		// check for wall collisions
 
 		if new_head.X >= game.board.Width || new_head.X < 0 || new_head.Y >= game.board.Height || new_head.Y < 0 {
 			continue
 		}
-
-		valid_move := true
-
-		// check for snake collisions
-
-		for _, other_snake := range game.board.Snakes {
-
-			if other_snake.ID != snakeId && snakeHasLostHeadToHead(snake, &other_snake) {
-				valid_move = false
-				break
-			}
-
-			if snakeHasBodyCollided(snake, &other_snake) {
-				valid_move = false
-				break
-			}
-
+		if snakeHasBodyCollided(&snake_moved, &snake_moved) {
+			break
 		}
 
-		if valid_move {
-			valid_moves = append(valid_moves, rules.SnakeMove{
-				ID:   snakeId,
-				Move: getMoveFromDir(dir),
-			})
-		}
+		valid_moves = append(valid_moves, rules.SnakeMove{
+			ID:   snakeId,
+			Move: dir,
+		})
 	}
-
 	return valid_moves
 }
 

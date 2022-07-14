@@ -16,6 +16,7 @@ type Tree struct {
 }
 
 type Node struct {
+	player     string
 	children   []*Node
 	parent     *Node
 	board      Simulation
@@ -30,6 +31,7 @@ func new_tree(game GameState) Tree {
 	return Tree{
 		player: game.You.ID,
 		root: &Node{
+			player:   game.You.ID,
 			children: []*Node{},
 			parent:   nil,
 			board:    simulationFromGame(&game),
@@ -66,7 +68,7 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 		move := get_move_by_snake(snake_id, child.joint_move)
 		best_move = move.Move
 		add_to_map(sims_for_move, move.Move, child.sims)
-		add_to_map(sims_for_move, move.Move, child.table[snake_id])
+		add_to_map(wins_for_move, move.Move, child.table[snake_id])
 	}
 
 	var most_sims float32 = 0.0
@@ -80,7 +82,7 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 		}
 	}
 
-	println("selected best move with", most_sims)
+	// println("selected best move with", most_sims)
 	return rules.SnakeMove{ID: snake_id, Move: best_move}
 }
 
@@ -191,6 +193,8 @@ func get_move_by_snake(snake_id string, joint_move []rules.SnakeMove) rules.Snak
 }
 
 func (node *Node) play_out() {
+	// println("playing out")
+	iterations := 0
 	game_over := false
 	copy_board := node.board.copy()
 	for !game_over {
@@ -208,8 +212,10 @@ func (node *Node) play_out() {
 			println(err.Error())
 			panic("error thrown while playing out")
 		}
+		iterations += 1
 	}
 	winner := copy_board.board.Snakes[0].ID
+	// println("finished with", iterations, "winner", winner, "node.player", node.player)
 	node.back_prop(winner)
 }
 
@@ -240,5 +246,6 @@ func create_child(parent *Node, joint_move []rules.SnakeMove, board Simulation) 
 		children:   []*Node{},
 		parent:     parent,
 		board:      board_copy,
+		player:     parent.player,
 	}
 }

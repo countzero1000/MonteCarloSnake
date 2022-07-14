@@ -1,5 +1,3 @@
 package main
 
-func main() {
-	start_server()
-}
+func main() { start_server() }

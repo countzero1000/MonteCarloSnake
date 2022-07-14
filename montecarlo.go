@@ -218,7 +218,7 @@ func (node *Node) play_out() {
 		selected_move := joint_moves[rand.Intn(len(joint_moves))]
 		new_game_over, new_board, err := copy_board.executeActions(selected_move)
 		copy_board.board = *new_board
-		game_over = new_game_over
+		game_over = !new_game_over
 
 		if err != nil {
 			println(err.Error())
@@ -227,6 +227,7 @@ func (node *Node) play_out() {
 		iterations += 1
 	}
 	winner := copy_board.board.Snakes[0].ID
+	println(len(copy_board.board.Snakes), "len of snakes after game is over", copy_board.board.Snakes[0].EliminatedCause, iterations)
 	// println("finished with", iterations, "winner", winner, "node.player", node.player)
 	node.back_prop(winner)
 }

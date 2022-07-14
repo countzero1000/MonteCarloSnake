@@ -3,6 +3,8 @@ package main
 import (
 	"math"
 	"math/rand"
+	"os"
+	"strconv"
 
 	"github.com/BattlesnakeOfficial/rules"
 )
@@ -38,8 +40,9 @@ func new_tree(game GameState) Tree {
 func (tree *Tree) monte_move() rules.SnakeMove {
 
 	tree.root.expandNode()
+	iterations, _ := strconv.Atoi(os.Getenv("iterations"))
 
-	for i := 0; i < 500; i++ {
+	for i := 0; i < iterations; i++ {
 		tree.expand_tree()
 	}
 

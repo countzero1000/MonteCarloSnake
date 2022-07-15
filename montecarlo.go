@@ -25,7 +25,7 @@ type Node struct {
 	joint_move []rules.SnakeMove
 }
 
-const c float64 = 1.141
+const c float64 = 1.41
 
 func new_tree(game GameState) Tree {
 	return Tree{
@@ -113,18 +113,20 @@ func (node *Node) expandNode() {
 
 func (node *Node) select_node() *Node {
 	var selected_moves = []rules.SnakeMove{}
+	best_move := rules.MoveDown
+
 	if len(node.children) > 0 {
 		for _, snake := range node.board.board.Snakes {
 			move_win_sum := make(map[string]int)
 			move_sim_sum := make(map[string]int)
 			for _, child := range node.children {
 				move := get_move_by_snake(snake.ID, child.joint_move)
+				best_move = move.Move
 				add_to_map(move_sim_sum, move.Move, child.sims[snake.ID])
 				add_to_map(move_win_sum, move.Move, child.table[snake.ID])
 			}
 
 			// get max move for the snake
-			best_move := rules.MoveDown
 			var best_val float64 = 0
 
 			for move, sims := range move_sim_sum {
@@ -134,16 +136,29 @@ func (node *Node) select_node() *Node {
 				}
 				utc_val := calc_utc_val(move_win_sum[move], sims, parent_sims)
 
-				if utc_val > float64(best_val) {
+				if utc_val > best_val {
 					best_move = move
 					best_val = utc_val
 				}
 			}
 
+			// println("selected node to explore with wins ", move_win_sum[best_move], "and sims", move_sim_sum[best_move])
+
 			selected_moves = append(selected_moves, rules.SnakeMove{
 				ID:   snake.ID,
 				Move: best_move,
 			})
+
+			for _, child := range node.children {
+				move := get_move_by_snake(snake.ID, child.joint_move)
+				if move.Move == best_move {
+					add_to_map(child.sims, snake.ID, 1)
+				}
+			}
+
+			// for _, child := range node.children {
+			// 	println(child.sims[snake.ID], child.table[snake.ID], get_move_by_snake(snake.ID, child.joint_move).Move)
+			// }
 		}
 
 		for _, child := range node.children {
@@ -158,7 +173,6 @@ func (node *Node) select_node() *Node {
 
 func compare_joint_move(joint_move []rules.SnakeMove, other []rules.SnakeMove) bool {
 	matches := 0
-
 	for _, move := range joint_move {
 		for _, move2 := range other {
 			if move.ID == move2.ID && move2.Move == move.Move {
@@ -170,6 +184,9 @@ func compare_joint_move(joint_move []rules.SnakeMove, other []rules.SnakeMove) b
 }
 
 func calc_utc_val(wins int, sims int, parent_sims int) float64 {
+	if sims == 0 {
+		return math.Inf(1)
+	}
 	return ((float64)(wins) / (float64)(sims)) + (c * math.Pow(math.Log((float64)(parent_sims))/(float64)(sims), .5))
 
 }
@@ -216,31 +233,29 @@ func (node *Node) play_out() {
 		}
 		iterations += 1
 	}
+
 	winner := get_winner(copy_board.board.Snakes)
+	node.back_prop(winner)
 
-	for _, snake := range copy_board.board.Snakes {
-		node.back_prop(winner, snake.ID)
-	}
 }
-func get_winner(snakes []rules.Snake) []string {
 
-	winners := []string{}
+func get_winner(snakes []rules.Snake) string {
+
 	for _, snake := range snakes {
 		if len(snake.EliminatedCause) == 0 {
-			winners = append(winners, snake.ID)
+			return snake.ID
 		}
+
 	}
-	return winners
+	return ""
 }
 
-func (node *Node) back_prop(winner []string, snake_id string) {
-	for _, win := range winner {
-		add_to_map(node.table, win, 1)
-	}
-	add_to_map(node.sims, snake_id, 1)
+func (node *Node) back_prop(winner string) {
+
+	add_to_map(node.table, winner, 1)
 
 	if node.parent != nil {
-		node.parent.back_prop(winner, snake_id)
+		node.parent.back_prop(winner)
 	}
 }
 

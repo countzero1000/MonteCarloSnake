@@ -44,7 +44,7 @@ func convert_settings(settings Settings) rules.Settings {
 
 func convert_ruleset(ruleset Ruleset) rules.StandardRuleset {
 	return rules.StandardRuleset{
-		FoodSpawnChance:     int(ruleset.Settings.FoodSpawnChance), // [0, 100]
+		FoodSpawnChance:     int(ruleset.Settings.FoodSpawnChance),
 		MinimumFood:         int(ruleset.Settings.MinimumFood),
 		HazardDamagePerTurn: int(ruleset.Settings.HazardDamagePerTurn),
 	}

@@ -61,38 +61,6 @@
                     "head": "default",
                     "tail": "default"
                 }
-            },
-            {
-                "id": "gs_cGHvRfpVm3cx7Y3kqr4dqMfY",
-                "name": "Peluchito",
-                "latency": "500",
-                "health": 99,
-                "body": [
-                    {
-                        "x": 9,
-                        "y": 6
-                    },
-                    {
-                        "x": 9,
-                        "y": 5
-                    },
-                    {
-                        "x": 9,
-                        "y": 5
-                    }
-                ],
-                "head": {
-                    "x": 9,
-                    "y": 6
-                },
-                "length": 3,
-                "shout": "",
-                "squad": "",
-                "customizations": {
-                    "color": "#ccab0e",
-                    "head": "bendr",
-                    "tail": "freckled"
-                }
             }
         ],
         "food": [

@@ -59,7 +59,7 @@ func (sim *Simulation) generateMoveMatrix() [][]rules.SnakeMove {
 		moves := sim.getValidMoves(snake_id)
 
 		if len(moves) == 0 {
-			continue
+			moves = []rules.SnakeMove{{ID: snake_id, Move: rules.MoveDown}}
 		}
 
 		var new_matrix = [][]rules.SnakeMove{}

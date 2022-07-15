@@ -27,7 +27,7 @@ type Node struct {
 	player_arr   []string
 }
 
-const c float64 = 1.41
+const c float64 = 1.141
 
 func new_tree(game GameState) Tree {
 	println("making new tree for", game.You.ID)
@@ -87,6 +87,7 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 		println(err.Error())
 		panic("error")
 	}
+	tree.root.expandNode()
 	println("running with", iterations, "iterations")
 	for i := 0; i < iterations; i++ {
 		tree.expand_tree()
@@ -98,23 +99,21 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 
 	best_move := rules.MoveRight
-	best_node := node.children[0]
 
 	var most_val float32 = 0
 
 	for _, child := range node.children {
 
-		println(child.action.Move, child.sims)
+		println(child.action.Move, child.sims, child.wins)
 
 		val := (float32)(child.sims)
 		if val > most_val {
 			most_val = val
-			best_node = child
 			best_move = child.action.Move
 		}
 	}
 
-	println(node.player, "selected best move with", most_val, "action", best_move, "with location", best_node.board.board.Snakes[0].Body[0].X, best_node.board.board.Snakes[0].Body[0].Y)
+	// println(node.player, "selected best move with", most_val, "wins", best_node.wins, "action", best_move, "with location", best_node.board.board.Snakes[0].Body[0].X, best_node.board.board.Snakes[0].Body[0].Y)
 	return rules.SnakeMove{ID: snake_id, Move: best_move}
 }
 
@@ -168,29 +167,10 @@ func (node *Node) select_node() *Node {
 
 func calc_utc_val(wins int, sims int, parent_sims int) float64 {
 	if sims == 0 {
-		return math.Inf(1)
+		return math.MaxInt
 	}
 	return ((float64)(wins) / (float64)(sims)) + (c * math.Pow(math.Log((float64)(parent_sims))/(float64)(sims), .5))
 
-}
-
-func add_to_map(m map[string]int, key string, insert_val int) {
-	_, exists := m[key]
-	if exists {
-		m[key] += insert_val
-	} else {
-		m[key] = insert_val
-	}
-
-}
-
-func get_move_by_snake(snake_id string, joint_move []rules.SnakeMove) rules.SnakeMove {
-	for _, move := range joint_move {
-		if move.ID == snake_id {
-			return move
-		}
-	}
-	return rules.SnakeMove{ID: snake_id, Move: rules.MoveDown}
 }
 
 func (node *Node) play_out() {
@@ -201,10 +181,6 @@ func (node *Node) play_out() {
 	for !game_over {
 
 		joint_moves := copy_board.generateMoveMatrix()
-		if len(joint_moves) == 0 {
-			game_over = true
-			break
-		}
 		selected_move := joint_moves[rand.Intn(len(joint_moves))]
 		new_game_over, new_board, err := copy_board.executeActions(selected_move)
 		copy_board.board = *new_board
@@ -215,6 +191,7 @@ func (node *Node) play_out() {
 			panic("error thrown while playing out")
 		}
 		iterations += 1
+		// println("finished playout with iterations", iterations)
 	}
 
 	winner := get_winner(copy_board.board.Snakes)

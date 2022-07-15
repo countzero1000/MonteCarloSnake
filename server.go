@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"net/http/httputil"
 	"os"
 )
 
@@ -120,11 +118,11 @@ func HandleStart(w http.ResponseWriter, r *http.Request) {
 
 func HandleMove(w http.ResponseWriter, r *http.Request) {
 
-	requestDump, err1 := httputil.DumpRequest(r, true)
-	if err1 != nil {
-		fmt.Println(err1)
-	}
-	fmt.Println(string(requestDump))
+	// requestDump, err1 := httputil.DumpRequest(r, true)
+	// if err1 != nil {
+	// 	fmt.Println(err1)
+	// }
+	// fmt.Println(string(requestDump))
 	state := GameState{}
 
 	err := json.NewDecoder(r.Body).Decode(&state)

@@ -1,6 +1,8 @@
 package main
 
-import "github.com/BattlesnakeOfficial/rules"
+import (
+	"github.com/BattlesnakeOfficial/rules"
+)
 
 type Direction string
 
@@ -141,6 +143,17 @@ func copy_snake(snake rules.Snake) *rules.Snake {
 	}
 }
 
+func snakeIsOutOfBounds(s *rules.Snake, boardWidth int, boardHeight int) bool {
+	for _, point := range s.Body {
+		if (point.X < 0) || (point.X >= boardWidth) {
+			return true
+		}
+		if (point.Y < 0) || (point.Y >= boardHeight) {
+			return true
+		}
+	}
+	return false
+}
 func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 	snake := get_snake(game.board, snakeId)
@@ -156,10 +169,9 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 	for _, dir := range dirs {
 
 		snake_moved := move_snake(copy_snake(*snake), dir)
-		new_head := snake_moved.Body[0]
 
 		// check for wall collisions
-		if new_head.X >= game.board.Width || new_head.X < 0 || new_head.Y >= game.board.Height || new_head.Y < 0 {
+		if snakeIsOutOfBounds(&snake_moved, game.board.Width, game.board.Height) {
 			continue
 		}
 
@@ -188,6 +200,7 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 		}
 
 	}
+
 	return valid_moves
 }
 
@@ -247,6 +260,102 @@ func (game *Simulation) executeActions(moves []rules.SnakeMove) (bool, *rules.Bo
 		}
 	}
 	return game.rules_set.Execute(&game.board, game.settings, moves)
+}
+
+func (game *Simulation) executeAction(move rules.SnakeMove) (bool, *rules.BoardState, error) {
+	move_arr := []rules.SnakeMove{move}
+
+	// StageGameOverStandard,
+	// StageMovementStandard,
+	// StageStarvationStandard,
+	// StageHazardDamageStandard,
+	// StageFeedSnakesStandard,
+	// StageEliminationStandard,
+
+	game_over, err := rules.GameOverStandard(&game.board, game.settings, move_arr)
+
+	if game_over {
+		return game_over, &game.board, err
+	}
+	_, err1 := MoveSnakesStandard(&game.board, game.settings, move_arr)
+	if err1 != nil {
+		panic(err1.Error())
+	}
+	_, err2 := rules.ReduceSnakeHealthStandard(&game.board, game.settings, move_arr)
+	if err2 != nil {
+		panic(err2.Error())
+	}
+	_, err3 := rules.FeedSnakesStandard(&game.board, game.settings, move_arr)
+	if err3 != nil {
+		panic(err3.Error())
+	}
+	_, err4 := rules.EliminateSnakesStandard(&game.board, game.settings, move_arr)
+	if err4 != nil {
+		panic(err4.Error())
+	}
+	return game_over, &game.board, nil
+}
+
+func MoveSnakesStandard(b *rules.BoardState, settings rules.Settings, moves []rules.SnakeMove) (bool, error) {
+	if rules.IsInitialization(b, settings, moves) {
+		return false, nil
+	}
+
+	// no-op when moves are empty
+	if len(moves) == 0 {
+		return false, nil
+	}
+
+	// Sanity check that all non-eliminated snakes have moves and bodies.
+	for i := 0; i < len(b.Snakes); i++ {
+		snake := &b.Snakes[i]
+		if snake.EliminatedCause != rules.NotEliminated {
+			continue
+		}
+
+		if len(snake.Body) == 0 {
+			return false, rules.ErrorZeroLengthSnake
+		}
+
+	}
+
+	for i := 0; i < len(b.Snakes); i++ {
+		snake := &b.Snakes[i]
+		if snake.EliminatedCause != rules.NotEliminated {
+			continue
+		}
+
+		for _, move := range moves {
+			if move.ID == snake.ID {
+				appliedMove := move.Move
+				switch move.Move {
+				case rules.MoveUp, rules.MoveDown, rules.MoveRight, rules.MoveLeft:
+					break
+				}
+
+				newHead := rules.Point{}
+				switch appliedMove {
+				// Guaranteed to be one of these options given the clause above
+				case rules.MoveUp:
+					newHead.X = snake.Body[0].X
+					newHead.Y = snake.Body[0].Y + 1
+				case rules.MoveDown:
+					newHead.X = snake.Body[0].X
+					newHead.Y = snake.Body[0].Y - 1
+				case rules.MoveLeft:
+					newHead.X = snake.Body[0].X - 1
+					newHead.Y = snake.Body[0].Y
+				case rules.MoveRight:
+					newHead.X = snake.Body[0].X + 1
+					newHead.Y = snake.Body[0].Y
+				}
+
+				// Append new head, pop old tail
+				snake.Body = append([]rules.Point{newHead}, snake.Body[:len(snake.Body)-1]...)
+			}
+		}
+	}
+	return false, nil
 }
 
 func find_missing_snakes(moves []rules.SnakeMove, snakes []rules.Snake) []string {

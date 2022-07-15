@@ -20,7 +20,7 @@ type Node struct {
 	children   []*Node
 	parent     *Node
 	board      Simulation
-	sims       int
+	sims       map[string]int
 	table      map[string]int
 	joint_move []rules.SnakeMove
 }
@@ -36,6 +36,7 @@ func new_tree(game GameState) Tree {
 			parent:   nil,
 			board:    simulationFromGame(&game),
 			table:    make(map[string]int),
+			sims:     make(map[string]int),
 		},
 	}
 }
@@ -68,7 +69,7 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 	for _, child := range node.children {
 		move := get_move_by_snake(snake_id, child.joint_move)
 		best_move = move.Move
-		add_to_map(sims_for_move, move.Move, child.sims)
+		add_to_map(sims_for_move, move.Move, child.sims[snake_id])
 		add_to_map(wins_for_move, move.Move, child.table[snake_id])
 	}
 
@@ -118,7 +119,7 @@ func (node *Node) select_node() *Node {
 			move_sim_sum := make(map[string]int)
 			for _, child := range node.children {
 				move := get_move_by_snake(snake.ID, child.joint_move)
-				add_to_map(move_sim_sum, move.Move, child.sims)
+				add_to_map(move_sim_sum, move.Move, child.sims[snake.ID])
 				add_to_map(move_win_sum, move.Move, child.table[snake.ID])
 			}
 
@@ -129,7 +130,7 @@ func (node *Node) select_node() *Node {
 			for move, sims := range move_sim_sum {
 				parent_sims := 1
 				if node.parent != nil {
-					parent_sims = node.parent.sims
+					parent_sims = node.parent.sims[snake.ID]
 				}
 				utc_val := calc_utc_val(move_win_sum[move], sims, parent_sims)
 
@@ -217,7 +218,9 @@ func (node *Node) play_out() {
 	}
 	winner := get_winner(copy_board.board.Snakes)
 
-	node.back_prop(winner)
+	for _, snake := range copy_board.board.Snakes {
+		node.back_prop(winner, snake.ID)
+	}
 }
 func get_winner(snakes []rules.Snake) []string {
 
@@ -230,14 +233,14 @@ func get_winner(snakes []rules.Snake) []string {
 	return winners
 }
 
-func (node *Node) back_prop(winner []string) {
+func (node *Node) back_prop(winner []string, snake_id string) {
 	for _, win := range winner {
 		add_to_map(node.table, win, 1)
 	}
-	node.sims++
+	add_to_map(node.sims, snake_id, 1)
 
 	if node.parent != nil {
-		node.parent.back_prop(winner)
+		node.parent.back_prop(winner, snake_id)
 	}
 }
 
@@ -253,7 +256,7 @@ func create_child(parent *Node, joint_move []rules.SnakeMove, board Simulation) 
 	}
 
 	return &Node{
-		sims:       0,
+		sims:       make(map[string]int),
 		table:      uct_table,
 		joint_move: joint_move,
 		children:   []*Node{},

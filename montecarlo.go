@@ -50,6 +50,7 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 		panic("error")
 	}
 	println("running with", iterations, "iterations")
+	tree.root.expandNode()
 	for i := 0; i < iterations; i++ {
 		tree.expand_tree()
 	}
@@ -72,6 +73,7 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 	}
 
 	var most_sims = 0
+
 	for move, sims := range sims_for_move {
 		println(wins_for_move[move], sims, move)
 		if sims > most_sims {
@@ -92,7 +94,7 @@ func (tree *Tree) expand_tree() {
 	var test_node = promising_node
 
 	if len(promising_node.children) > 0 {
-		test_node = promising_node.children[(int)(math.Floor((float64)(rand.Intn(len(promising_node.children)))))]
+		test_node = promising_node.children[rand.Intn(len(promising_node.children))]
 	}
 
 	test_node.play_out()

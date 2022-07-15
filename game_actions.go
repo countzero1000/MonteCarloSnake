@@ -133,9 +133,7 @@ func move_snake(snake *rules.Snake, appliedMove string) rules.Snake {
 func copy_snake(snake rules.Snake) *rules.Snake {
 	new_body := []rules.Point{}
 
-	for _, p := range snake.Body {
-		new_body = append(new_body, p)
-	}
+	new_body = append(new_body, snake.Body...)
 
 	return &rules.Snake{
 		ID:   snake.ID,

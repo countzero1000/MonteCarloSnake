@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func test_monte_move(t *testing.T) {
+func Test_MonteCarlo(t *testing.T) {
 
 	test_body, err := os.ReadFile("test_request.json")
 	if err != nil {

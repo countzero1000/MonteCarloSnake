@@ -183,10 +183,13 @@ func (node *Node) play_out() {
 	// println("playing out")
 	iterations := 0
 	game_over := false
+	// snake := node.board.board.Snakes[0]
+	// println(snake.Health, "starting health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y)
 	copy_board := node.board.copy()
 	for !game_over {
 
-		if iterations == 250 {
+		if iterations >= 10 {
+			game_over = true
 			break
 		}
 
@@ -194,15 +197,19 @@ func (node *Node) play_out() {
 
 		for _, snake := range node.board.board.Snakes {
 			moves := node.board.getValidMoves(snake.ID)
+			// for _, move := range moves {
+			// 	// println("valid move", move.Move)
+			// }
 			if len(moves) == 0 {
 				moves = []rules.SnakeMove{{ID: snake.ID, Move: rules.MoveUp}}
 			}
 			move := moves[rand.Intn(len(moves))]
+			// println("applied move", move.Move)
 			selected_move = append(selected_move, move)
+			// println("helf", snake.Health)
 		}
-
-		new_game_over, new_board, err := copy_board.executeActions(selected_move)
-		copy_board.board = *new_board
+		new_game_over, _, err := copy_board.executeActions(selected_move)
+		// copy_board.board = *new_board
 		game_over = new_game_over
 
 		if err != nil {
@@ -210,8 +217,10 @@ func (node *Node) play_out() {
 			panic("error thrown while playing out")
 		}
 		iterations += 1
-		// println("finished playout with iterations", iterations)
 	}
+	// println("finished playout with iterations", iterations)
+	// snake = copy_board.board.Snakes[0]
+	// println(snake.Health, "ending health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y)
 
 	winner := get_winner(copy_board.board.Snakes)
 	node.back_prop(winner)
@@ -222,6 +231,7 @@ func get_winner(snakes []rules.Snake) string {
 
 	for _, snake := range snakes {
 		if len(snake.EliminatedCause) == 0 {
+			// println(snake.Health, "winner helf")
 			return snake.ID
 		}
 

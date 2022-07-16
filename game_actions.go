@@ -131,10 +131,19 @@ func move_snake(snake *rules.Snake, appliedMove string) rules.Snake {
 	return *snake
 }
 
-func copy_snake(snake rules.Snake) *rules.Snake {
-	new_body := []rules.Point{}
+func copy_point(point rules.Point) rules.Point {
+	return rules.Point{
+		X: point.X,
+		Y: point.Y,
+	}
+}
 
-	new_body = append(new_body, snake.Body...)
+func copy_snake(snake rules.Snake) *rules.Snake {
+	new_body := make([]rules.Point, len(snake.Body))
+
+	for _, bod := range snake.Body {
+		new_body = append(new_body, copy_point(bod))
+	}
 
 	return &rules.Snake{
 		ID:   snake.ID,
@@ -143,14 +152,14 @@ func copy_snake(snake rules.Snake) *rules.Snake {
 }
 
 func snakeIsOutOfBounds(s *rules.Snake, boardWidth int, boardHeight int) bool {
-	for _, point := range s.Body {
-		if (point.X < 0) || (point.X >= boardWidth) {
-			return true
-		}
-		if (point.Y < 0) || (point.Y >= boardHeight) {
-			return true
-		}
+	point := s.Body[0]
+	if (point.X < 0) || (point.X >= boardWidth) {
+		return true
 	}
+	if (point.Y < 0) || (point.Y >= boardHeight) {
+		return true
+	}
+
 	return false
 }
 func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
@@ -170,17 +179,18 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 		snake_moved := move_snake(copy_snake(*snake), dir)
 
 		// check for wall collisions
-		if snakeIsOutOfBounds(&snake_moved, game.board.Width, game.board.Height) {
-			continue
-		}
+		// if snakeIsOutOfBounds(&snake_moved, game.board.Width, game.board.Height) {
+		// 	continue
+		// }
 
 		valid := true
 
 		for _, snake := range game.board.Snakes {
-			if snake_self_collided(&snake_moved, &snake) {
-				valid = false
-				break
-			}
+			// if snake_self_collided(&snake_moved, &snake) {
+			// 	valid = false
+			// 	break
+			// }
+
 			if snake.ID == snake_moved.ID {
 				continue
 			}

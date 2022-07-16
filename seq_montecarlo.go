@@ -97,25 +97,47 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 	return tree.root.select_best_move(tree.player, tree.name)
 }
 
+func (node *Node) recur_print() {
+	snake := get_snake(node.board.board, node.action.ID).Body[0]
+	println("player:", node.player, "moved", node.action.Move, "wins:", node.wins, "sims:", node.sims, "position", snake.X, snake.Y)
+	if len(node.children) == 0 {
+		return
+	}
+	println("child: {")
+	best_node := node.children[0]
+	for _, child := range node.children {
+		if child.sims > best_node.sims {
+			best_node = child
+		}
+	}
+	best_node.recur_print()
+	print("}")
+}
+
 func (node *Node) select_best_move(snake_id string, name string) rules.SnakeMove {
 
-	best_move := rules.MoveRight
-
-	var most_val float32 = 0
-
-	for _, child := range node.children {
-
-		println(child.action.Move, child.sims, child.wins)
-
-		val := (float32)(child.wins)
-		if val > most_val {
-			most_val = val
-			best_move = child.action.Move
+	if len(node.children) == 0 {
+		println("out of moves selecting up")
+		return rules.SnakeMove{
+			ID:   node.get_next_player(node.player),
+			Move: rules.MoveUp,
 		}
 	}
 
-	println(name, "selected best move", best_move)
-	return rules.SnakeMove{ID: snake_id, Move: best_move}
+	best_node := node.children[0]
+
+	for _, child := range node.children {
+		println(child.action.Move, child.sims, child.wins)
+
+		val := child.sims
+		if val > best_node.sims {
+			best_node = child
+		}
+	}
+
+	println(name, "selected best move", best_node.action.Move, "on turn", node.board.board.Turn)
+	// best_node.recur_print()
+	return best_node.action
 }
 
 func (tree *Tree) expand_tree() {
@@ -166,6 +188,16 @@ func (node *Node) select_node() *Node {
 	return node
 }
 
+func (node *Node) utc_val() float64 {
+	parent_sims := 1
+
+	if node.parent != nil {
+		parent_sims = node.sims
+	}
+
+	return calc_utc_val(node.wins, node.sims, parent_sims)
+}
+
 func calc_utc_val(wins int, sims int, parent_sims int) float64 {
 	if sims == 0 {
 		return math.MaxInt
@@ -199,7 +231,8 @@ func (node *Node) play_out() {
 			// 	println("valid move", move.Move)
 			// }
 			if len(moves) == 0 {
-				break
+				node.back_prop(node.get_prev_player(snake.ID))
+				return
 			}
 			move := moves[rand.Intn(len(moves))]
 			// println("applied move", move.Move)

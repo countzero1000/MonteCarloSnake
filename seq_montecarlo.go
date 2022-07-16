@@ -231,8 +231,8 @@ func (node *Node) play_out() {
 			// 	println("valid move", move.Move)
 			// }
 			if len(moves) == 0 {
-				node.back_prop(node.get_prev_player(snake.ID))
-				return
+				snake.EliminatedCause = "Out of valid moves DED"
+				continue
 			}
 			move := moves[rand.Intn(len(moves))]
 			// println("applied move", move.Move)
@@ -271,7 +271,7 @@ func get_winner(snakes []rules.Snake) string {
 		}
 
 	}
-	return ""
+	return "tie"
 }
 
 func (node *Node) back_prop(winner string) {

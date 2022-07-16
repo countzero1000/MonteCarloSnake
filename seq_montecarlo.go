@@ -220,7 +220,7 @@ func (node *Node) play_out() {
 	}
 	// println("finished playout with iterations", iterations)
 	// snake = copy_board.board.Snakes[0]
-	// println(snake.Health, "ending health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y)
+	// println(snake.Health, "ending health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y, len(snake.Body))
 
 	winner := get_winner(copy_board.board.Snakes)
 	node.back_prop(winner)

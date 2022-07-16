@@ -131,6 +131,28 @@ func move_snake(snake *rules.Snake, appliedMove string) rules.Snake {
 	return *snake
 }
 
+func move_point(point rules.Point, appliedMove string) rules.Point {
+
+	new_point := rules.Point{}
+
+	switch appliedMove {
+	// Guaranteed to be one of these options given the clause above
+	case rules.MoveUp:
+		new_point.X = point.X
+		new_point.Y = point.Y + 1
+	case rules.MoveDown:
+		new_point.X = point.X
+		new_point.Y = point.Y - 1
+	case rules.MoveLeft:
+		new_point.X = point.X - 1
+		new_point.Y = point.Y
+	case rules.MoveRight:
+		new_point.X = point.X + 1
+		new_point.Y = point.Y
+	}
+	return new_point
+}
+
 func copy_point(point rules.Point) rules.Point {
 	return rules.Point{
 		X: point.X,
@@ -162,6 +184,7 @@ func snakeIsOutOfBounds(s *rules.Snake, boardWidth int, boardHeight int) bool {
 
 	return false
 }
+
 func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 	snake := get_snake(game.board, snakeId)
@@ -176,30 +199,34 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 	for _, dir := range dirs {
 
-		snake_moved := move_snake(copy_snake(*snake), dir)
+		snake_moved := move_point(snake.Body[0], dir)
 
 		// check for wall collisions
-		// if snakeIsOutOfBounds(&snake_moved, game.board.Width, game.board.Height) {
-		// 	continue
-		// }
+		if snake_moved.X >= game.board.Width || snake_moved.X < 0 || snake_moved.Y >= game.board.Height || snake_moved.Y < 0 {
+			continue
+		}
 
 		valid := true
 
-		for _, snake := range game.board.Snakes {
-			// if snake_self_collided(&snake_moved, &snake) {
-			// 	valid = false
-			// 	break
-			// }
-
-			if snake.ID == snake_moved.ID {
-				continue
-			}
-
-			if snakeHasLostHeadToHead(&snake_moved, &snake) {
-				valid = false
-				break
-			}
+		if snake_moved.X == snake.Body[1].X && snake_moved.Y == snake.Body[1].Y {
+			continue
 		}
+
+		// for _, snake := range game.board.Snakes {
+		// 	// if snake_self_collided(&snake_moved, &snake) {
+		// 	// 	valid = false
+		// 	// 	break
+		// 	// }
+
+		// 	if snake.ID == snake_moved.ID {
+		// 		continue
+		// 	}
+
+		// 	if snakeHasLostHeadToHead(&snake_moved, &snake) {
+		// 		valid = false
+		// 		break
+		// 	}
+		// }
 
 		if valid {
 			valid_moves = append(valid_moves, rules.SnakeMove{

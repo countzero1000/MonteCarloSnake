@@ -188,7 +188,7 @@ func (node *Node) play_out() {
 	copy_board := node.board.copy()
 	for !game_over {
 
-		if iterations >= 10 {
+		if iterations+copy_board.board.Turn >= 250 {
 			game_over = true
 			break
 		}

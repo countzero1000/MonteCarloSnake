@@ -28,7 +28,7 @@ type Node struct {
 	player_arr   []string
 }
 
-const c float64 = 1.141
+const c float64 = 2
 
 func new_tree(game GameState) Tree {
 	println("making new tree for", game.You.ID)
@@ -108,7 +108,7 @@ func (node *Node) select_best_move(snake_id string, name string) rules.SnakeMove
 
 		println(child.action.Move, child.sims, child.wins)
 
-		val := (float32)(child.wins) / (float32)(child.sims)
+		val := (float32)(child.sims)
 		if val > most_val {
 			most_val = val
 			best_move = child.action.Move

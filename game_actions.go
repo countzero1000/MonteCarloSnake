@@ -9,7 +9,7 @@ type Direction string
 type Simulation struct {
 	board     rules.BoardState
 	settings  rules.Settings
-	rules_set rules.SoloRuleset
+	rules_set rules.StandardRuleset
 }
 
 func (sim *Simulation) copy() Simulation {
@@ -44,13 +44,13 @@ func convert_settings(settings Settings) rules.Settings {
 	}
 }
 
-func convert_ruleset(ruleset Ruleset) rules.SoloRuleset {
-	return rules.SoloRuleset{
-		rules.StandardRuleset{
-			FoodSpawnChance:     int(ruleset.Settings.FoodSpawnChance),
-			MinimumFood:         int(ruleset.Settings.MinimumFood),
-			HazardDamagePerTurn: int(ruleset.Settings.HazardDamagePerTurn),
-		}}
+func convert_ruleset(ruleset Ruleset) rules.StandardRuleset {
+
+	return rules.StandardRuleset{
+		FoodSpawnChance:     int(ruleset.Settings.FoodSpawnChance),
+		MinimumFood:         int(ruleset.Settings.MinimumFood),
+		HazardDamagePerTurn: int(ruleset.Settings.HazardDamagePerTurn),
+	}
 }
 
 func (sim *Simulation) generateMoveMatrix() [][]rules.SnakeMove {
@@ -138,25 +138,25 @@ func move_point(point rules.Point, appliedMove string) rules.Point {
 	switch appliedMove {
 	// Guaranteed to be one of these options given the clause above
 	case rules.MoveUp:
-		new_point.X = point.X
-		new_point.Y = point.Y + 1
+		new_point.X = int(point.X)
+		new_point.Y = int(point.Y + 1)
 	case rules.MoveDown:
-		new_point.X = point.X
-		new_point.Y = point.Y - 1
+		new_point.X = int(point.X)
+		new_point.Y = int(point.Y - 1)
 	case rules.MoveLeft:
-		new_point.X = point.X - 1
-		new_point.Y = point.Y
+		new_point.X = int(point.X - 1)
+		new_point.Y = int(point.Y)
 	case rules.MoveRight:
-		new_point.X = point.X + 1
-		new_point.Y = point.Y
+		new_point.X = int(point.X + 1)
+		new_point.Y = int(point.Y)
 	}
 	return new_point
 }
 
 func copy_point(point rules.Point) rules.Point {
 	return rules.Point{
-		X: point.X,
-		Y: point.Y,
+		X: int(point.X),
+		Y: int(point.Y),
 	}
 }
 
@@ -193,9 +193,9 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 	var valid_moves = []rules.SnakeMove{}
 
-	if snake.EliminatedCause != "" {
-		return valid_moves
-	}
+	// if snake.EliminatedCause != "" {
+	// 	return valid_moves
+	// }
 
 	for _, dir := range dirs {
 
@@ -203,13 +203,17 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 		// check for wall collisions
 		if snake_moved.X >= game.board.Width || snake_moved.X < 0 || snake_moved.Y >= game.board.Height || snake_moved.Y < 0 {
+			// println("avoided wall collision", snake_moved.X, snake_moved.Y)
 			continue
 		}
 
 		valid := true
 
-		if snake_moved.X == snake.Body[1].X && snake_moved.Y == snake.Body[1].Y {
-			continue
+		for _, bod := range snake.Body {
+			if snake_moved.X == bod.X && snake_moved.Y == bod.Y {
+				valid = false
+				break
+			}
 		}
 
 		// for _, snake := range game.board.Snakes {

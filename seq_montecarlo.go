@@ -188,23 +188,31 @@ func (node *Node) play_out() {
 	copy_board := node.board.copy()
 	for !game_over {
 
+		// if iterations >= 100 {
+		// 	break
+		// }
+
 		selected_move := []rules.SnakeMove{}
 
-		for _, snake := range node.board.board.Snakes {
-			moves := node.board.getValidMoves(snake.ID)
+		for _, snake := range copy_board.board.Snakes {
+			moves := copy_board.getValidMoves(snake.ID)
 			// for _, move := range moves {
-			// 	// println("valid move", move.Move)
+			// 	println("valid move", move.Move)
 			// }
 			if len(moves) == 0 {
-				moves = []rules.SnakeMove{{ID: snake.ID, Move: rules.MoveUp}}
+				break
 			}
 			move := moves[rand.Intn(len(moves))]
 			// println("applied move", move.Move)
 			selected_move = append(selected_move, move)
 			// println("helf", snake.Health)
 		}
-		new_game_over, _, err := copy_board.executeActions(selected_move)
-		// copy_board.board = *new_board
+		new_game_over, new_board, err := copy_board.executeActions(selected_move)
+		// snake = copy_board.board.Snakes[0]
+		// println(snake.Health, "after application", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y, len(snake.Body))
+		copy_board.board = *new_board
+
+		// println(copy_board.board.Snakes[0].Health)
 		game_over = new_game_over
 
 		if err != nil {
@@ -215,7 +223,7 @@ func (node *Node) play_out() {
 	}
 	// println("finished playout with iterations", iterations)
 	// snake = copy_board.board.Snakes[0]
-	// println(snake.Health, "ending health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y, len(snake.Body))
+	// println(snake.Health, "ending health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y, len(snake.Body), copy_board.board.Turn)
 
 	winner := get_winner(copy_board.board.Snakes)
 	node.back_prop(winner)

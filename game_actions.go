@@ -9,7 +9,7 @@ type Direction string
 type Simulation struct {
 	board     rules.BoardState
 	settings  rules.Settings
-	rules_set rules.StandardRuleset
+	rules_set rules.SoloRuleset
 }
 
 func (sim *Simulation) copy() Simulation {
@@ -44,12 +44,13 @@ func convert_settings(settings Settings) rules.Settings {
 	}
 }
 
-func convert_ruleset(ruleset Ruleset) rules.StandardRuleset {
-	return rules.StandardRuleset{
-		FoodSpawnChance:     int(ruleset.Settings.FoodSpawnChance),
-		MinimumFood:         int(ruleset.Settings.MinimumFood),
-		HazardDamagePerTurn: int(ruleset.Settings.HazardDamagePerTurn),
-	}
+func convert_ruleset(ruleset Ruleset) rules.SoloRuleset {
+	return rules.SoloRuleset{
+		rules.StandardRuleset{
+			FoodSpawnChance:     int(ruleset.Settings.FoodSpawnChance),
+			MinimumFood:         int(ruleset.Settings.MinimumFood),
+			HazardDamagePerTurn: int(ruleset.Settings.HazardDamagePerTurn),
+		}}
 }
 
 func (sim *Simulation) generateMoveMatrix() [][]rules.SnakeMove {

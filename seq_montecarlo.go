@@ -82,7 +82,6 @@ func (node *Node) get_prev_player(snake_id string) string {
 
 func (tree *Tree) monte_move() rules.SnakeMove {
 
-	tree.root.expandNode()
 	godotenv.Load(".env")
 	iterations, err := strconv.Atoi(os.Getenv("iterations"))
 	if err != nil {

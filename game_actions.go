@@ -270,11 +270,6 @@ func (game *Simulation) executeAction(move rules.SnakeMove) (bool, *rules.BoardS
 	// StageFeedSnakesStandard,
 	// StageEliminationStandard,
 
-	game_over, err := rules.GameOverStandard(&game.board, game.settings, move_arr)
-
-	if game_over {
-		return game_over, &game.board, err
-	}
 	_, err1 := MoveSnakesStandard(&game.board, game.settings, move_arr)
 	if err1 != nil {
 		panic(err1.Error())
@@ -290,6 +285,12 @@ func (game *Simulation) executeAction(move rules.SnakeMove) (bool, *rules.BoardS
 	_, err4 := rules.EliminateSnakesStandard(&game.board, game.settings, move_arr)
 	if err4 != nil {
 		panic(err4.Error())
+	}
+
+	game_over, err := rules.GameOverStandard(&game.board, game.settings, move_arr)
+
+	if game_over {
+		return game_over, &game.board, err
 	}
 	return game_over, &game.board, nil
 }

@@ -13,6 +13,7 @@ import (
 type Tree struct {
 	player string
 	root   *Node
+	name   string
 }
 
 type Node struct {
@@ -51,6 +52,7 @@ func new_tree(game GameState) Tree {
 	}
 	tree := Tree{
 		player: game.You.ID,
+		name:   game.You.Name,
 		root: &Node{
 			player_arr:   player_arr,
 			player_order: player_order,
@@ -93,10 +95,10 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 		tree.expand_tree()
 	}
 
-	return tree.root.select_best_move(tree.player)
+	return tree.root.select_best_move(tree.player, tree.name)
 }
 
-func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
+func (node *Node) select_best_move(snake_id string, name string) rules.SnakeMove {
 
 	best_move := rules.MoveRight
 
@@ -113,7 +115,7 @@ func (node *Node) select_best_move(snake_id string) rules.SnakeMove {
 		}
 	}
 
-	// println(node.player, "selected best move with", most_val, "wins", best_node.wins, "action", best_move, "with location", best_node.board.board.Snakes[0].Body[0].X, best_node.board.board.Snakes[0].Body[0].Y)
+	println(name, "selected best move", best_move)
 	return rules.SnakeMove{ID: snake_id, Move: best_move}
 }
 
@@ -184,8 +186,17 @@ func (node *Node) play_out() {
 	copy_board := node.board.copy()
 	for !game_over {
 
-		joint_moves := copy_board.generateMoveMatrix()
-		selected_move := joint_moves[rand.Intn(len(joint_moves))]
+		selected_move := []rules.SnakeMove{}
+
+		for _, snake := range node.board.board.Snakes {
+			moves := node.board.getValidMoves(snake.ID)
+			if len(moves) == 0 {
+				moves = []rules.SnakeMove{{ID: snake.ID, Move: rules.MoveUp}}
+			}
+			move := moves[rand.Intn(len(moves))]
+			selected_move = append(selected_move, move)
+		}
+
 		new_game_over, new_board, err := copy_board.executeActions(selected_move)
 		copy_board.board = *new_board
 		game_over = new_game_over

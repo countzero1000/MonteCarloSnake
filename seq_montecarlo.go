@@ -188,11 +188,6 @@ func (node *Node) play_out() {
 	copy_board := node.board.copy()
 	for !game_over {
 
-		if iterations+copy_board.board.Turn >= 250 {
-			game_over = true
-			break
-		}
-
 		selected_move := []rules.SnakeMove{}
 
 		for _, snake := range node.board.board.Snakes {

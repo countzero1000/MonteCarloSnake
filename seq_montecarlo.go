@@ -28,7 +28,7 @@ type Node struct {
 	player_arr   []string
 }
 
-const c float64 = 2
+const c float64 = 1.141
 
 func new_tree(game GameState) Tree {
 	println("making new tree for", game.You.ID)

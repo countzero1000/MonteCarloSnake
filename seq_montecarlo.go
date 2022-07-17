@@ -103,6 +103,8 @@ func (node *Node) recur_print() {
 	if len(node.children) == 0 {
 		for _, snake := range node.board.board.Snakes {
 
+			// printMap(&node.board.board)
+
 			println("snake", snake.ID, "eliminated by", snake.EliminatedCause, snake.EliminatedBy, snake.EliminatedOnTurn, "snake length", len(snake.Body))
 		}
 		return
@@ -119,14 +121,6 @@ func (node *Node) recur_print() {
 }
 
 func (node *Node) select_best_move(snake_id string, name string) rules.SnakeMove {
-
-	if len(node.children) == 0 {
-		println("out of moves selecting up")
-		return rules.SnakeMove{
-			ID:   node.get_next_player(node.player),
-			Move: rules.MoveUp,
-		}
-	}
 
 	best_node := node.children[0]
 

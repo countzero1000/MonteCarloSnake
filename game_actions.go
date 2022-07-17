@@ -1,6 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
+	"log"
+
 	"github.com/BattlesnakeOfficial/rules"
 )
 
@@ -20,6 +24,61 @@ func (sim *Simulation) copy() Simulation {
 	}
 }
 
+func printMap(boardState *rules.BoardState) {
+
+	var o bytes.Buffer
+	o.WriteString(fmt.Sprintf("Ruleset: %s, Seed: %d, Turn: %v\n", boardState.Turn))
+	board := make([][]string, boardState.Width)
+	for i := range board {
+		board[i] = make([]string, boardState.Height)
+	}
+	for y := int(0); y < boardState.Height; y++ {
+		for x := int(0); x < boardState.Width; x++ {
+			if true {
+				board[x][y] = TERM_FG_LIGHTGRAY + "□"
+			} else {
+				board[x][y] = "◦"
+			}
+		}
+	}
+	for _, oob := range boardState.Hazards {
+
+		board[oob.X][oob.Y] = "░"
+
+	}
+	if true {
+		o.WriteString(fmt.Sprintf("Hazards "+TERM_BG_GRAY+" "+TERM_RESET+": %v\n", boardState.Hazards))
+	} else {
+		o.WriteString(fmt.Sprintf("Hazards ░: %v\n", boardState.Hazards))
+	}
+	for _, f := range boardState.Food {
+
+		board[f.X][f.Y] = "⚕"
+
+	}
+
+	o.WriteString(fmt.Sprintf("Food ⚕: %v\n", boardState.Food))
+
+	for _, s := range boardState.Snakes {
+		for _, b := range s.Body {
+			if b.X >= 0 && b.X < boardState.Width && b.Y >= 0 && b.Y < boardState.Height {
+
+				board[b.X][b.Y] = string("o")
+
+			}
+		}
+
+	}
+	for y := boardState.Height - 1; y >= 0; y-- {
+
+		for x := int(0); x < boardState.Width; x++ {
+			o.WriteString(board[x][y])
+		}
+
+		o.WriteString("\n")
+	}
+	log.Print(o.String())
+}
 func simulationFromGame(game *GameState) Simulation {
 	return Simulation{
 		board: rules.BoardState{
@@ -206,9 +265,9 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 	var valid_moves = []rules.SnakeMove{}
 
-	// if snake.EliminatedCause != "" {
-	// 	return valid_moves
-	// }
+	if snake.EliminatedCause != "" {
+		return valid_moves
+	}
 
 	for _, dir := range dirs {
 

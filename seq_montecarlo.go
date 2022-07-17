@@ -205,7 +205,7 @@ func calc_utc_val(wins int, sims int, parent_sims int) float64 {
 	if sims == 0 {
 		return math.MaxInt
 	}
-	discover := (c * math.Sqrt(math.Log((float64)(parent_sims+1))/(float64)(sims)))
+	discover := (c * math.Sqrt(math.Log((float64)(parent_sims))/(float64)(sims)))
 	reward := ((float64)(wins) / (float64)(sims))
 
 	// println("reward", reward, "discover", discover, wins, sims, parent_sims)

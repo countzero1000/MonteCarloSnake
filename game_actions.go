@@ -27,10 +27,22 @@ func simulationFromGame(game *GameState) Simulation {
 			Height: game.Board.Height,
 			Width:  game.Board.Width,
 			Snakes: convertSnakes(game.Board.Snakes),
+			Food:   convert_food(game.Board.Food),
 		},
 		rules_set: convert_ruleset(game.Game.Ruleset),
 		settings:  convert_settings(game.Game.Ruleset.Settings),
 	}
+}
+
+func convert_food(food []Coord) []rules.Point {
+	real_food := []rules.Point{}
+	for _, f := range food {
+		real_food = append(real_food, rules.Point{
+			X: f.X,
+			Y: f.Y,
+		})
+	}
+	return real_food
 }
 
 func convert_settings(settings Settings) rules.Settings {

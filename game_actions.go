@@ -23,6 +23,7 @@ func (sim *Simulation) copy() Simulation {
 func simulationFromGame(game *GameState) Simulation {
 	return Simulation{
 		board: rules.BoardState{
+			Turn:   game.Turn,
 			Height: game.Board.Height,
 			Width:  game.Board.Width,
 			Snakes: convertSnakes(game.Board.Snakes),

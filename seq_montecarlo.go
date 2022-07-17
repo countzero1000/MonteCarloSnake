@@ -136,7 +136,7 @@ func (node *Node) select_best_move(snake_id string, name string) rules.SnakeMove
 	}
 
 	println(name, "selected best move", best_node.action.Move, "on turn", node.board.board.Turn)
-	// best_node.recur_print()
+	best_node.recur_print()
 	return best_node.action
 }
 

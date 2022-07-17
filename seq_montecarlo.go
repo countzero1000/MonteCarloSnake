@@ -133,8 +133,8 @@ func (node *Node) select_best_move(snake_id string, name string) rules.SnakeMove
 	for _, child := range node.children {
 		println(child.action.Move, child.sims, child.wins)
 
-		val := child.sims
-		if val > best_node.sims {
+		val := (float64)(child.wins) / (float64)(child.sims)
+		if val > (float64)(best_node.wins)/(float64)(best_node.sims) {
 			best_node = child
 		}
 	}

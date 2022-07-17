@@ -263,6 +263,8 @@ func (game *Simulation) find_food_moves(snakeId string) rules.SnakeMove {
 	closest := math.MaxInt
 	closest_move := rules.MoveUp
 
+	no_move := true
+
 	snake := get_snake(game.board, snakeId)
 
 	var dirs = []string{rules.MoveUp, rules.MoveDown, rules.MoveLeft, rules.MoveRight}
@@ -305,6 +307,10 @@ func (game *Simulation) find_food_moves(snakeId string) rules.SnakeMove {
 		// }
 
 		if valid {
+			if no_move {
+				closest_move = dir
+				no_move = false
+			}
 
 			for _, food := range game.board.Food {
 				xd := food.X - snake_moved.X

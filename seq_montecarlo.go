@@ -28,7 +28,7 @@ type Node struct {
 	player_arr   []string
 }
 
-const c float64 = 1.141
+const c float64 = 2
 
 func new_tree(game GameState) Tree {
 	println("making new tree for", game.You.ID)
@@ -102,7 +102,8 @@ func (node *Node) recur_print() {
 	println("player:", node.player, "moved", node.action.Move, "wins:", node.wins, "sims:", node.sims, "position", snake.X, snake.Y)
 	if len(node.children) == 0 {
 		for _, snake := range node.board.board.Snakes {
-			println("snake", snake.ID, "eliminated by", snake.EliminatedCause, snake.EliminatedBy, snake.EliminatedOnTurn)
+
+			println("snake", snake.ID, "eliminated by", snake.EliminatedCause, snake.EliminatedBy, snake.EliminatedOnTurn, "snake length", len(snake.Body))
 		}
 		return
 	}
@@ -220,6 +221,7 @@ func (node *Node) play_out() {
 	// snake := node.board.board.Snakes[0]
 	// println(snake.Health, "starting health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y)
 	copy_board := node.board.copy()
+	copy_board.settings.FoodSpawnChance = 0
 	for !game_over {
 
 		// if iterations >= 100 {

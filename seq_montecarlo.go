@@ -240,8 +240,8 @@ func (node *Node) play_out() {
 			// 	println("valid move", move.Move)
 			// }
 			if len(moves) == 0 {
-				snake.EliminatedCause = "Out of valid moves DED"
-				continue
+				moves = append(moves, rules.SnakeMove{ID: snake.ID, Move: rules.MoveLeft})
+
 			}
 			move := moves[rand.Intn(len(moves))]
 			// println("applied move", move.Move)

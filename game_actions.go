@@ -206,9 +206,9 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 	var valid_moves = []rules.SnakeMove{}
 
-	if snake.EliminatedCause != "" {
-		return valid_moves
-	}
+	// if snake.EliminatedCause != "" {
+	// 	return valid_moves
+	// }
 
 	for _, dir := range dirs {
 
@@ -252,6 +252,10 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 			})
 		}
 
+	}
+
+	if len(valid_moves) == 0 {
+		valid_moves = append(valid_moves, rules.SnakeMove{Move: rules.MoveUp, ID: snakeId})
 	}
 
 	return valid_moves
@@ -325,29 +329,32 @@ func (game *Simulation) executeAction(move rules.SnakeMove) (bool, *rules.BoardS
 	// StageFeedSnakesStandard,
 	// StageEliminationStandard,
 
-	_, err1 := MoveSnakesStandard(&game.board, game.settings, move_arr)
-	if err1 != nil {
-		panic(err1.Error())
-
-	}
-	_, err4 := rules.EliminateSnakesStandard(&game.board, game.settings, move_arr)
-	if err4 != nil {
-		panic(err4.Error())
-	}
-	_, err2 := rules.ReduceSnakeHealthStandard(&game.board, game.settings, move_arr)
-	if err2 != nil {
-		panic(err2.Error())
-	}
-	_, err3 := rules.FeedSnakesStandard(&game.board, game.settings, move_arr)
-	if err3 != nil {
-		panic(err3.Error())
-	}
-
 	game_over, err := rules.GameOverStandard(&game.board, game.settings, move_arr)
 
 	if game_over {
 		return game_over, &game.board, err
 	}
+
+	_, err1 := MoveSnakesStandard(&game.board, game.settings, move_arr)
+	if err1 != nil {
+		panic(err1.Error())
+	}
+
+	_, err2 := rules.ReduceSnakeHealthStandard(&game.board, game.settings, move_arr)
+	if err2 != nil {
+		panic(err2.Error())
+	}
+
+	_, err3 := rules.FeedSnakesStandard(&game.board, game.settings, move_arr)
+	if err3 != nil {
+		panic(err3.Error())
+	}
+
+	_, err4 := rules.EliminateSnakesStandard(&game.board, game.settings, move_arr)
+	if err4 != nil {
+		panic(err4.Error())
+	}
+
 	return game_over, &game.board, nil
 }
 

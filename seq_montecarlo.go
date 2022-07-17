@@ -103,7 +103,7 @@ func (node *Node) recur_print() {
 	if len(node.children) == 0 {
 		for _, snake := range node.board.board.Snakes {
 
-			// printMap(&node.board.board)
+			printMap(&node.board.board)
 
 			println("snake", snake.ID, "eliminated by", snake.EliminatedCause, snake.EliminatedBy, snake.EliminatedOnTurn, "snake length", len(snake.Body))
 		}

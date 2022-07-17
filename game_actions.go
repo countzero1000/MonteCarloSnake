@@ -27,7 +27,7 @@ func (sim *Simulation) copy() Simulation {
 func printMap(boardState *rules.BoardState) {
 
 	var o bytes.Buffer
-	o.WriteString(fmt.Sprintf("Ruleset: %s, Seed: %d, Turn: %v\n", boardState.Turn))
+	o.WriteString(fmt.Sprintf("Turn: %v\n", boardState.Turn))
 	board := make([][]string, boardState.Width)
 	for i := range board {
 		board[i] = make([]string, boardState.Height)

@@ -233,7 +233,7 @@ func copy_point(point rules.Point) rules.Point {
 }
 
 func copy_snake(snake rules.Snake) *rules.Snake {
-	new_body := make([]rules.Point, len(snake.Body))
+	new_body := []rules.Point{}
 
 	for _, bod := range snake.Body {
 		new_body = append(new_body, copy_point(bod))
@@ -271,38 +271,31 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 	for _, dir := range dirs {
 
-		snake_moved := move_point(snake.Body[0], dir)
+		snake_moved := move_snake(copy_snake(*snake), dir)
 
 		// check for wall collisions
-		if snake_moved.X >= game.board.Width || snake_moved.X < 0 || snake_moved.Y >= game.board.Height || snake_moved.Y < 0 {
+		if snakeIsOutOfBounds(&snake_moved, game.board.Width, game.board.Height) {
 			// println("avoided wall collision", snake_moved.X, snake_moved.Y)
 			continue
 		}
 
 		valid := true
 
-		for _, bod := range snake.Body {
-			if snake_moved.X == bod.X && snake_moved.Y == bod.Y {
+		for _, snake := range game.board.Snakes {
+			if snake_self_collided(&snake_moved, &snake) {
 				valid = false
 				break
 			}
+
+			// if snake.ID == snake_moved.ID {
+			// 	continue
+			// }
+
+			// if snakeHasLostHeadToHead(&snake_moved, &snake) {
+			// 	valid = false
+			// 	break
+			// }
 		}
-
-		// for _, snake := range game.board.Snakes {
-		// 	// if snake_self_collided(&snake_moved, &snake) {
-		// 	// 	valid = false
-		// 	// 	break
-		// 	// }
-
-		// 	if snake.ID == snake_moved.ID {
-		// 		continue
-		// 	}
-
-		// 	if snakeHasLostHeadToHead(&snake_moved, &snake) {
-		// 		valid = false
-		// 		break
-		// 	}
-		// }
 
 		if valid {
 			valid_moves = append(valid_moves, rules.SnakeMove{

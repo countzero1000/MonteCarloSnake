@@ -46,6 +46,6 @@ func move(state GameState) BattlesnakeMoveResponse {
 	tree := new_tree(state)
 
 	return BattlesnakeMoveResponse{
-		Move: tree.monte_move().Move,
+		Move: tree.find_food_move(),
 	}
 }

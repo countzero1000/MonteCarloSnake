@@ -30,6 +30,12 @@ type Node struct {
 
 const c float64 = 1.141
 
+func (tree *Tree) find_food_move() string {
+	player := tree.root.get_next_player(tree.root.player)
+	return tree.root.board.find_food_moves(player).Move
+
+}
+
 func new_tree(game GameState) Tree {
 	println("making new tree for", game.You.ID)
 	player_order := make(map[string]int)

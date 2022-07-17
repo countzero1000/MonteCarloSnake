@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"math"
 
 	"github.com/BattlesnakeOfficial/rules"
 )
@@ -255,6 +256,74 @@ func snakeIsOutOfBounds(s *rules.Snake, boardWidth int, boardHeight int) bool {
 	}
 
 	return false
+}
+
+func (game *Simulation) find_food_moves(snakeId string) rules.SnakeMove {
+
+	closest := math.MaxInt
+	closest_move := rules.MoveUp
+
+	snake := get_snake(game.board, snakeId)
+
+	var dirs = []string{rules.MoveUp, rules.MoveDown, rules.MoveLeft, rules.MoveRight}
+
+	for _, dir := range dirs {
+
+		println(dir)
+
+		snake_moved := move_point(copy_point(snake.Body[0]), dir)
+
+		// check for wall collisions
+		if snake_moved.X >= game.board.Width || snake_moved.X < 0 || snake_moved.Y >= game.board.Height || snake_moved.Y < 0 {
+			// println("avoided wall collision", snake_moved.X, snake_moved.Y)
+			continue
+		}
+
+		valid := true
+
+		for _, bod := range snake.Body {
+			if snake_moved.X == bod.X && snake_moved.Y == bod.Y {
+				valid = false
+				break
+			}
+		}
+
+		// for _, snake := range game.board.Snakes {
+		// 	if snake_self_collided(&snake_moved, &snake) {
+		// 		valid = false
+		// 		break
+		// 	}
+
+		// 	if snake.ID == snake_moved.ID {
+		// 		continue
+		// 	}
+
+		// 	if snakeHasLostHeadToHead(&snake_moved, &snake) {
+		// 		valid = false
+		// 		break
+		// 	}
+		// }
+
+		if valid {
+
+			for _, food := range game.board.Food {
+				xd := food.X - snake_moved.X
+				yd := food.Y - snake_moved.Y
+
+				println(xd*xd+yd*yd, dir)
+
+				if xd*xd+yd*yd < closest {
+					closest = xd*xd + yd*yd
+					closest_move = dir
+					println("closest", dir, food.X, food.Y)
+				}
+			}
+		}
+
+	}
+
+	return rules.SnakeMove{ID: snakeId, Move: closest_move}
+
 }
 
 func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {

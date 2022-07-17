@@ -299,7 +299,8 @@ func (node *Node) back_prop(winner string) {
 func create_child(parent *Node, action rules.SnakeMove, board Simulation, player string) *Node {
 
 	board_copy := board.copy()
-	_, new_board, _ := board_copy.executeAction(action)
+	last_in_rotation := parent.player_order[player] == (len(parent.player_arr) - 1)
+	_, new_board, _ := board_copy.executeAction(action, last_in_rotation)
 	board_copy.board = *new_board
 
 	return &Node{

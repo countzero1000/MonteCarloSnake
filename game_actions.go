@@ -453,7 +453,7 @@ func (game *Simulation) executeActions(moves []rules.SnakeMove) (bool, *rules.Bo
 	return game.rules_set.Execute(&game.board, game.settings, moves)
 }
 
-func (game *Simulation) executeAction(move rules.SnakeMove) (bool, *rules.BoardState, error) {
+func (game *Simulation) executeAction(move rules.SnakeMove, last_in_rotation bool) (bool, *rules.BoardState, error) {
 	move_arr := []rules.SnakeMove{move}
 
 	// StageGameOverStandard,
@@ -479,9 +479,11 @@ func (game *Simulation) executeAction(move rules.SnakeMove) (bool, *rules.BoardS
 		panic(err2.Error())
 	}
 
-	_, err3 := rules.FeedSnakesStandard(&game.board, game.settings, move_arr)
-	if err3 != nil {
-		panic(err3.Error())
+	if last_in_rotation {
+		_, err3 := rules.FeedSnakesStandard(&game.board, game.settings, move_arr)
+		if err3 != nil {
+			panic(err3.Error())
+		}
 	}
 
 	_, err4 := rules.EliminateSnakesStandard(&game.board, game.settings, move_arr)

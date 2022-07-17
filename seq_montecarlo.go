@@ -225,7 +225,7 @@ func (node *Node) play_out() {
 	// snake := node.board.board.Snakes[0]
 	// println(snake.Health, "starting health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y)
 	copy_board := node.board.copy()
-	copy_board.settings.FoodSpawnChance = 0
+
 	for !game_over {
 
 		// if iterations >= 100 {

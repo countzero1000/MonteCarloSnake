@@ -112,6 +112,7 @@ func (node *Node) recur_print() {
 	println("child: {")
 	best_node := node.children[0]
 	for _, child := range node.children {
+		println("[", child.wins, ",", child.sims, "]")
 		if child.sims > best_node.sims {
 			best_node = child
 		}

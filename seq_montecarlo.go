@@ -101,6 +101,9 @@ func (node *Node) recur_print() {
 	snake := get_snake(node.board.board, node.action.ID).Body[0]
 	println("player:", node.player, "moved", node.action.Move, "wins:", node.wins, "sims:", node.sims, "position", snake.X, snake.Y)
 	if len(node.children) == 0 {
+		for _, snake := range node.board.board.Snakes {
+			println("snake", snake.ID, "eliminated by", snake.EliminatedCause, snake.EliminatedBy, snake.EliminatedOnTurn)
+		}
 		return
 	}
 	println("child: {")

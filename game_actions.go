@@ -281,21 +281,21 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 		valid := true
 
-		for _, snake := range game.board.Snakes {
-			if snake_self_collided(&snake_moved, &snake) {
-				valid = false
-				break
-			}
+		// for _, snake := range game.board.Snakes {
+		// 	if snake_self_collided(&snake_moved, &snake) {
+		// 		valid = false
+		// 		break
+		// 	}
 
-			// if snake.ID == snake_moved.ID {
-			// 	continue
-			// }
+		// 	// if snake.ID == snake_moved.ID {
+		// 	// 	continue
+		// 	// }
 
-			// if snakeHasLostHeadToHead(&snake_moved, &snake) {
-			// 	valid = false
-			// 	break
-			// }
-		}
+		// 	// if snakeHasLostHeadToHead(&snake_moved, &snake) {
+		// 	// 	valid = false
+		// 	// 	break
+		// 	// }
+		// }
 
 		if valid {
 			valid_moves = append(valid_moves, rules.SnakeMove{

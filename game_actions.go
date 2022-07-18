@@ -332,6 +332,7 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 	var valid_moves = []rules.SnakeMove{}
 
 	if snake.EliminatedCause != "" {
+
 		return valid_moves
 	}
 

@@ -222,10 +222,13 @@ func calc_utc_val(wins int, sims int, parent_sims int) float64 {
 func (node *Node) play_out() {
 	// println("playing out")
 	iterations := 0
-	game_over := false
 	// snake := node.board.board.Snakes[0]
 	// println(snake.Health, "starting health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y)
 	copy_board := node.board.copy()
+
+	game_over, _ := node.board.rules_set.IsGameOver(&copy_board.board)
+
+	current_turn := node.get_next_player(node.player)
 
 	for !game_over {
 
@@ -233,29 +236,27 @@ func (node *Node) play_out() {
 		// 	break
 		// }
 
-		selected_move := []rules.SnakeMove{}
+		check_game_over, _ := node.board.rules_set.IsGameOver(&copy_board.board)
 
-		for _, snake := range copy_board.board.Snakes {
-			moves := copy_board.getValidMoves(snake.ID)
-			// for _, move := range moves {
-			// 	println("valid move", move.Move)
-			// }
-			if len(moves) == 0 {
-				moves = append(moves, rules.SnakeMove{ID: snake.ID, Move: rules.MoveLeft})
-
-			}
-			move := moves[rand.Intn(len(moves))]
-			// println("applied move", move.Move)
-			selected_move = append(selected_move, move)
-			// println("helf", snake.Health)
+		if check_game_over {
+			break
 		}
-		new_game_over, new_board, err := copy_board.executeActions(selected_move)
+
+		moves := copy_board.getValidMoves(current_turn)
+
+		selected_move := moves[rand.Intn(len(moves))]
+
+		last_in_rotation := node.player_order[current_turn] == (len(node.player_arr) - 1)
+
+		new_game_over, new_board, err := copy_board.executeAction(selected_move, last_in_rotation)
 		// snake = copy_board.board.Snakes[0]
 		// println(snake.Health, "after application", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y, len(snake.Body))
 		copy_board.board = *new_board
 
 		// println(copy_board.board.Snakes[0].Health)
 		game_over = new_game_over
+
+		current_turn = node.get_next_player(current_turn)
 
 		if err != nil {
 			println(err.Error())

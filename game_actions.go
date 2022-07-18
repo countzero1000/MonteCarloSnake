@@ -35,22 +35,13 @@ func printMap(boardState *rules.BoardState) {
 	}
 	for y := int(0); y < boardState.Height; y++ {
 		for x := int(0); x < boardState.Width; x++ {
-			if true {
-				board[x][y] = TERM_FG_LIGHTGRAY + "□"
-			} else {
-				board[x][y] = "◦"
-			}
+			board[x][y] = "◦"
 		}
 	}
 	for _, oob := range boardState.Hazards {
 
 		board[oob.X][oob.Y] = "░"
 
-	}
-	if true {
-		o.WriteString(fmt.Sprintf("Hazards "+TERM_BG_GRAY+" "+TERM_RESET+": %v\n", boardState.Hazards))
-	} else {
-		o.WriteString(fmt.Sprintf("Hazards ░: %v\n", boardState.Hazards))
 	}
 	for _, f := range boardState.Food {
 

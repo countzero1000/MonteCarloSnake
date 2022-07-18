@@ -421,9 +421,6 @@ func snakeHasLostHeadToHead(s *rules.Snake, other *rules.Snake) bool {
 
 func snake_self_collided(head rules.Point, other *rules.Snake) bool {
 	for i, body := range other.Body {
-		if i == 0 {
-			continue
-		}
 		if i == len(other.Body)-1 {
 			continue
 		}

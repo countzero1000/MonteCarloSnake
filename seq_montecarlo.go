@@ -228,6 +228,9 @@ func (node *Node) play_out() {
 
 	game_over, _ := node.board.rules_set.IsGameOver(&copy_board.board)
 
+	copy_board.rules_set.FoodSpawnChance /= 2
+	copy_board.settings.FoodSpawnChance /= 2
+
 	current_turn := node.get_next_player(node.player)
 
 	for !game_over {

@@ -363,22 +363,21 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 		// 	}
 		// }
 
-		for _, snake := range game.board.Snakes {
-			if snake_self_collided(snake_moved, &snake) {
+		for _, other := range game.board.Snakes {
+			if snake_self_collided(snake_moved, &other) {
+				valid = false
+				break
+			}
+
+			if snake.ID == snakeId {
+				continue
+			}
+
+			if snakeHasLostHeadToHead(&snake_moved, &other, len(snake.Body)) {
 				valid = false
 				break
 			}
 		}
-
-		// 	if snake.ID == snake_moved.ID {
-		// 		continue
-		// 	}
-
-		// 	if snakeHasLostHeadToHead(&snake_moved, &snake) {
-		// 		valid = false
-		// 		break
-		// 	}
-		// }
 
 		if valid {
 			valid_moves = append(valid_moves, rules.SnakeMove{
@@ -412,15 +411,18 @@ func getMoveFromDir(dir []int) string {
 	}
 }
 
-func snakeHasLostHeadToHead(s *rules.Snake, other *rules.Snake) bool {
-	if s.Body[0].X == other.Body[0].X && s.Body[0].Y == other.Body[0].Y {
-		return len(s.Body) <= len(other.Body)
+func snakeHasLostHeadToHead(head *rules.Point, other *rules.Snake, head_len int) bool {
+	if head.X == other.Body[0].X && head.Y == other.Body[0].Y {
+		return head_len <= len(other.Body)
 	}
 	return false
 }
 
 func snake_self_collided(head rules.Point, other *rules.Snake) bool {
 	for i, body := range other.Body {
+		if i == 0 {
+			continue
+		}
 		if i == len(other.Body)-1 {
 			continue
 		}

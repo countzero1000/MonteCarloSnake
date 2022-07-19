@@ -18,10 +18,10 @@ func info() BattlesnakeInfoResponse {
 	log.Println("INFO")
 	return BattlesnakeInfoResponse{
 		APIVersion: "1",
-		Author:     "",          // TODO: Your Battlesnake username
-		Color:      "#12d5db",   // TODO: Personalize
-		Head:       "sand-worm", // TODO: Personalize
-		Tail:       "sharp",     // TODO: Personalize
+		Author:     "",        // TODO: Your Battlesnake username
+		Color:      "#12d5db", // TODO: Personalize
+		Head:       "shades",  // TODO: Personalize
+		Tail:       "sharp",   // TODO: Personalize
 	}
 }
 

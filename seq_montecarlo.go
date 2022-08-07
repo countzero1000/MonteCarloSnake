@@ -247,6 +247,10 @@ func (node *Node) play_out() {
 
 		moves := copy_board.getValidMoves(current_turn)
 
+		if len(moves) == 0 {
+			moves = append(moves, rules.SnakeMove{Move: rules.MoveDown, ID: current_turn})
+		}
+
 		selected_move := moves[rand.Intn(len(moves))]
 
 		last_in_rotation := node.player_order[current_turn] == (len(node.player_arr) - 1)

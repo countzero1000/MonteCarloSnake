@@ -266,9 +266,7 @@ func (game *Simulation) find_food_moves(snakeId string) rules.SnakeMove {
 
 		snake_moved := move_point(copy_point(snake.Body[0]), dir)
 
-		// check for wall collisions
 		if snake_moved.X >= game.board.Width || snake_moved.X < 0 || snake_moved.Y >= game.board.Height || snake_moved.Y < 0 {
-			// println("avoided wall collision", snake_moved.X, snake_moved.Y)
 			continue
 		}
 
@@ -280,22 +278,6 @@ func (game *Simulation) find_food_moves(snakeId string) rules.SnakeMove {
 				break
 			}
 		}
-
-		// for _, snake := range game.board.Snakes {
-		// 	if snake_self_collided(&snake_moved, &snake) {
-		// 		valid = false
-		// 		break
-		// 	}
-
-		// 	if snake.ID == snake_moved.ID {
-		// 		continue
-		// 	}
-
-		// 	if snakeHasLostHeadToHead(&snake_moved, &snake) {
-		// 		valid = false
-		// 		break
-		// 	}
-		// }
 
 		if valid {
 			if no_move {
@@ -340,21 +322,12 @@ func (game *Simulation) getValidMoves(snakeId string) []rules.SnakeMove {
 
 		snake_moved := move_point(snake.Body[0], dir)
 
-		// check for wall collisions
+		// Checks for wall collisions.
 		if snake_moved.X >= game.board.Width || snake_moved.X < 0 || snake_moved.Y >= game.board.Height || snake_moved.Y < 0 {
-			// println("avoided wall collision", snake_moved.X, snake_moved.Y)
 			continue
 		}
 
 		valid := true
-
-		// for _, bod := range snake.Body {
-		// 	if snake_moved.X == bod.X && snake_moved.Y == bod.Y {
-		// 		valid = false
-		// 		break
-		// 	}
-		// }
-
 		for _, other := range game.board.Snakes {
 			if snake_self_collided(snake_moved, &other) {
 				valid = false
@@ -449,13 +422,6 @@ func (game *Simulation) executeActions(moves []rules.SnakeMove) (bool, *rules.Bo
 
 func (game *Simulation) executeAction(move rules.SnakeMove, last_in_rotation bool) (bool, *rules.BoardState, error) {
 	move_arr := []rules.SnakeMove{move}
-
-	// StageGameOverStandard,
-	// StageMovementStandard,
-	// StageStarvationStandard,
-	// StageHazardDamageStandard,
-	// StageFeedSnakesStandard,
-	// StageEliminationStandard,
 
 	game_over, err := rules.GameOverStandard(&game.board, game.settings, move_arr)
 

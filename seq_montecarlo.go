@@ -29,15 +29,9 @@ type Node struct {
 }
 
 const c float64 = 1.141
-
-func (tree *Tree) find_food_move() string {
-	player := tree.root.get_next_player(tree.root.player)
-	return tree.root.board.find_food_moves(player).Move
-
-}
+const DEBUG_MODE = false
 
 func new_tree(game GameState) Tree {
-	println("making new tree for", game.You.ID)
 	player_order := make(map[string]int)
 	player_arr := []string{}
 	player_arr = append(player_arr, game.You.ID)
@@ -47,11 +41,9 @@ func new_tree(game GameState) Tree {
 		}
 	}
 
-	println("array for", game.You.ID, "=================")
 	for _, id := range player_arr {
 		println(id)
 	}
-	println("=========================")
 
 	for i, snake := range player_arr {
 		player_order[snake] = i
@@ -95,7 +87,6 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 		panic("error")
 	}
 	tree.root.expandNode()
-	println("running with", iterations, "iterations")
 	for i := 0; i < iterations; i++ {
 		tree.expand_tree()
 	}
@@ -104,6 +95,11 @@ func (tree *Tree) monte_move() rules.SnakeMove {
 }
 
 func (node *Node) recur_print() {
+
+	if !DEBUG_MODE {
+		return
+	}
+
 	snake := get_snake(node.board.board, node.action.ID).Body[0]
 	println("player:", node.player, "moved", node.action.Move, "wins:", node.wins, "sims:", node.sims, "position", snake.X, snake.Y)
 	printMap(&node.board.board)
@@ -167,9 +163,6 @@ func (node *Node) expandNode() {
 
 	new_player := node.get_next_player(node.player)
 	move_matrix := node.board.getValidMoves(new_player)
-
-	// println("expanding for", new_player, "after", node.player)
-
 	for _, joint_move := range move_matrix {
 		node.children = append(node.children, create_child(node, joint_move, node.board, new_player))
 	}
@@ -197,47 +190,25 @@ func (node *Node) select_node() *Node {
 	return node
 }
 
-func (node *Node) utc_val() float64 {
-	parent_sims := 1
-
-	if node.parent != nil {
-		parent_sims = node.sims
-	}
-
-	return calc_utc_val(node.wins, node.sims, parent_sims)
-}
-
 func calc_utc_val(wins int, sims int, parent_sims int) float64 {
 	if sims == 0 {
 		return math.MaxInt
 	}
 	discover := (c * math.Sqrt(math.Log((float64)(parent_sims+1))/(float64)(sims)))
 	reward := ((float64)(wins) / (float64)(sims))
-
-	// println("reward", reward, "discover", discover, wins, sims, parent_sims)
 	return reward + discover
 
 }
 
 func (node *Node) play_out() {
-	// println("playing out")
 	iterations := 0
-	// snake := node.board.board.Snakes[0]
-	// println(snake.Health, "starting health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y)
 	copy_board := node.board.copy()
-
 	game_over, _ := node.board.rules_set.IsGameOver(&copy_board.board)
-
 	copy_board.rules_set.FoodSpawnChance /= 2
 	copy_board.settings.FoodSpawnChance /= 2
-
 	current_turn := node.get_next_player(node.player)
 
 	for !game_over {
-
-		// if iterations >= 100 {
-		// 	break
-		// }
 
 		check_game_over, _ := node.board.rules_set.IsGameOver(&copy_board.board)
 
@@ -252,17 +223,10 @@ func (node *Node) play_out() {
 		}
 
 		selected_move := moves[rand.Intn(len(moves))]
-
 		last_in_rotation := node.player_order[current_turn] == (len(node.player_arr) - 1)
-
 		new_game_over, new_board, err := copy_board.executeAction(selected_move, last_in_rotation)
-		// snake = copy_board.board.Snakes[0]
-		// println(snake.Health, "after application", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y, len(snake.Body))
 		copy_board.board = *new_board
-
-		// println(copy_board.board.Snakes[0].Health)
 		game_over = new_game_over
-
 		current_turn = node.get_next_player(current_turn)
 
 		if err != nil {
@@ -271,10 +235,6 @@ func (node *Node) play_out() {
 		}
 		iterations += 1
 	}
-	// println("finished playout with iterations", iterations)
-	// snake = copy_board.board.Snakes[0]
-	// println(snake.Health, "ending health", snake.EliminatedCause, snake.Body[0].X, snake.Body[0].Y, len(snake.Body), copy_board.board.Turn)
-
 	winner := get_winner(copy_board.board.Snakes)
 	node.back_prop(winner)
 
@@ -284,10 +244,8 @@ func get_winner(snakes []rules.Snake) string {
 
 	for _, snake := range snakes {
 		if len(snake.EliminatedCause) == 0 {
-			// println(snake.Health, "winner helf")
 			return snake.ID
 		}
-
 	}
 	return "tie"
 }

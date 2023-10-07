@@ -91,8 +91,7 @@ type BattlesnakeMoveResponse struct {
 	Shout string `json:"shout,omitempty"`
 }
 
-// HTTP Handlers
-
+// HTTP Handlers.
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	response := info()
 
@@ -112,17 +111,10 @@ func HandleStart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	start(state)
-
-	// Nothing to respond with here
 }
 
 func HandleMove(w http.ResponseWriter, r *http.Request) {
 
-	// requestDump, err1 := httputil.DumpRequest(r, true)
-	// if err1 != nil {
-	// 	fmt.Println(err1)
-	// }
-	// fmt.Println(string(requestDump))
 	state := GameState{}
 
 	err := json.NewDecoder(r.Body).Decode(&state)
@@ -155,7 +147,6 @@ func HandleEnd(w http.ResponseWriter, r *http.Request) {
 }
 
 // Middleware
-
 func withServerID(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Server", ServerID)
@@ -164,7 +155,6 @@ func withServerID(next http.HandlerFunc) http.HandlerFunc {
 }
 
 // Main Entrypoint
-
 func start_server() {
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
